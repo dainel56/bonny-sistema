@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonny Finance — Sistema de Producción v4.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── ROOT ────────────────────────────────────────────────────────── */
+:root{
+  --teal:    #00d4aa;
+  --teal2:   #00a886;
+  --navy:    #0d1b2a;
+  --navy2:   #1a2f45;
+  --navy3:   #243850;
+  --gold:    #f4a300;
+  --green:   #2ecc71;
+  --red:     #e74c3c;
+  --blue:    #3498db;
+  --text:    #e8f4f0;
+  --muted:   #7a9e95;
+  --border:  rgba(0,212,170,.15);
+  --card:    rgba(13,27,42,.8);
+  --radius:  10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--navy);
+  color:var(--text);
+  font-family:'Space Grotesk',sans-serif;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 80% 10%, rgba(0,212,170,.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 10% 80%, rgba(244,163,0,.04) 0%, transparent 50%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── LAYOUT ──────────────────────────────────────────────────────── */
+.shell{position:relative;z-index:1;display:flex;min-height:100vh}
+.sidebar{
+  width:220px;flex-shrink:0;
+  background:rgba(10,20,32,.95);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:0 0 20px;
+  position:sticky;top:0;height:100vh;
+  overflow-y:auto;
+}
+.main{flex:1;padding:28px 32px 60px;max-width:960px}
+
+/* ── SIDEBAR ─────────────────────────────────────────────────────── */
+.sb-logo{
+  padding:22px 18px 16px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:10px;
+}
+.sb-logo-name{font-size:16px;font-weight:700;color:var(--teal);letter-spacing:-.3px}
+.sb-logo-ver{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px}
+
+.sb-section{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 18px 6px;font-family:'DM Mono',monospace}
+
+.sb-btn{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 18px;
+  font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:500;
+  color:#8ab0a8;
+  background:transparent;border:none;cursor:pointer;
+  width:100%;text-align:left;
+  transition:all .14s;
+  border-left:2px solid transparent;
+}
+.sb-btn:hover{color:var(--text);background:rgba(0,212,170,.06);border-left-color:rgba(0,212,170,.3)}
+.sb-btn.active{color:var(--teal);background:rgba(0,212,170,.1);border-left-color:var(--teal);font-weight:600}
+.sb-icon{width:16px;text-align:center;flex-shrink:0;font-size:14px}
+
+.sb-divider{height:1px;background:var(--border);margin:10px 18px}
+
+/* ── PANELS ──────────────────────────────────────────────────────── */
+.panel{display:none}
+.panel.active{display:block}
+
+/* ── HEADER ──────────────────────────────────────────────────────── */
+.page-head{margin-bottom:24px}
+.page-title{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--muted)}
+.teal{color:var(--teal)}
+.gold{color:var(--gold)}
+
+/* ── CARDS ───────────────────────────────────────────────────────── */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px 22px;
+  margin-bottom:16px;
+  backdrop-filter:blur(8px);
+}
+.card-title{
+  font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--teal);margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── FORM ELEMENTS ───────────────────────────────────────────────── */
+label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px;letter-spacing:.5px;text-transform:uppercase}
+input[type=text],textarea,select{
+  width:100%;
+  background:rgba(0,0,0,.3);
+  border:1px solid var(--border);
+  border-radius:6px;
+  color:var(--text);
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13px;
+  padding:9px 12px;
+  outline:none;
+  resize:vertical;
+  transition:border-color .15s;
+}
+input:focus,textarea:focus,select:focus{border-color:var(--teal)}
+input::placeholder,textarea::placeholder{color:rgba(122,158,149,.5)}
+select option{background:var(--navy2);color:var(--text)}
+
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.form-row.three{grid-template-columns:1fr 1fr 1fr}
+.form-group{margin-bottom:14px}
+
+/* ── BUTTONS ─────────────────────────────────────────────────────── */
+.btn{
+  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;
+  padding:9px 18px;border-radius:7px;border:none;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;
+  transition:all .15s;white-space:nowrap;
+}
+.btn-primary{background:var(--teal);color:var(--navy);font-weight:700}
+.btn-primary:hover{background:var(--teal2);transform:translateY(-1px)}
+.btn-gold{background:var(--gold);color:var(--navy);font-weight:700}
+.btn-gold:hover{opacity:.88;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--teal);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--teal);background:rgba(0,212,170,.08)}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent}
+.btn-ghost:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.btn-copy{background:rgba(0,212,170,.12);color:var(--teal);border:1px solid var(--border)}
+.btn-copy:hover{background:rgba(0,212,170,.2)}
+.btn-sm{font-size:11px;padding:6px 12px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+/* ── OUTPUT BOX ──────────────────────────────────────────────────── */
+.output-box{
+  background:rgba(0,0,0,.35);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:16px;
+  font-family:'DM Mono',monospace;
+  font-size:12px;
+  color:#a8d5cb;
+  line-height:1.7;
+  white-space:pre-wrap;
+  word-break:break-word;
+  max-height:420px;
+  overflow-y:auto;
+  position:relative;
+}
+.output-box:empty::before{content:'El prompt generado aparecerá aquí...';color:var(--muted);font-style:italic}
+.output-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:8px;
+}
+.output-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:'DM Mono',monospace}
+
+/* ── CHIPS / TAGS ────────────────────────────────────────────────── */
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{
+  font-size:11px;padding:3px 10px;border-radius:20px;
+  border:1px solid var(--border);color:var(--muted);
+  cursor:pointer;transition:all .14s;
+  font-family:'DM Mono',monospace;
+}
+.chip:hover,.chip.on{background:rgba(0,212,170,.12);color:var(--teal);border-color:rgba(0,212,170,.4)}
+.chip.tipo-a.on{background:rgba(52,152,219,.12);color:#74c0fc;border-color:rgba(52,152,219,.4)}
+.chip.tipo-b.on{background:rgba(46,204,113,.12);color:#69db7c;border-color:rgba(46,204,113,.4)}
+.chip.tipo-c.on{background:rgba(244,163,0,.12);color:var(--gold);border-color:rgba(244,163,0,.4)}
+
+/* ── ALERT / INFO ────────────────────────────────────────────────── */
+.info-box{
+  background:rgba(0,212,170,.06);
+  border:1px solid rgba(0,212,170,.2);
+  border-left:3px solid var(--teal);
+  border-radius:6px;
+  padding:12px 14px;
+  font-size:12px;color:#8abfb8;
+  line-height:1.6;margin-bottom:14px;
+}
+.warn-box{
+  background:rgba(244,163,0,.06);
+  border:1px solid rgba(244,163,0,.2);
+  border-left:3px solid var(--gold);
+  border-radius:6px;
+  padding:12px 14px;
+  font-size:12px;color:#c4a059;
+  line-height:1.6;margin-bottom:14px;
+}
+
+/* ── STEP LIST ───────────────────────────────────────────────────── */
+.steps{display:flex;flex-direction:column;gap:10px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step-n{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(0,212,170,.12);border:1px solid var(--teal);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--teal);flex-shrink:0;
+}
+.step-body{flex:1;padding-top:4px}
+.step-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.step-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* ── GRID CARDS ──────────────────────────────────────────────────── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:640px){.grid-2,.grid-3{grid-template-columns:1fr}.form-row,.form-row.three{grid-template-columns:1fr}.sidebar{display:none}}
+
+.mini-card{
+  background:rgba(0,0,0,.25);border:1px solid var(--border);
+  border-radius:8px;padding:14px;
+}
+.mini-card-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;font-family:'DM Mono',monospace}
+.mini-card-val{font-size:22px;font-weight:700;color:var(--teal)}
+.mini-card-sub{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── TABLE ───────────────────────────────────────────────────────── */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:8px 10px;background:rgba(0,212,170,.08);color:var(--teal);font-size:10px;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+.tbl td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:#a8c5bf;vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+
+/* ── BADGE ───────────────────────────────────────────────────────── */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 8px;border-radius:20px;font-family:'DM Mono',monospace;font-weight:500}
+.badge-teal{background:rgba(0,212,170,.15);color:var(--teal);border:1px solid rgba(0,212,170,.3)}
+.badge-gold{background:rgba(244,163,0,.15);color:var(--gold);border:1px solid rgba(244,163,0,.3)}
+.badge-green{background:rgba(46,204,113,.15);color:var(--green);border:1px solid rgba(46,204,113,.3)}
+.badge-red{background:rgba(231,76,60,.15);color:var(--red);border:1px solid rgba(231,76,60,.3)}
+
+/* ── TOAST ───────────────────────────────────────────────────────── */
+#toast{
+  position:fixed;bottom:28px;right:28px;z-index:9999;
+  background:var(--teal);color:var(--navy);
+  font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;
+  padding:10px 20px;border-radius:8px;
+  opacity:0;transform:translateY(10px);
+  transition:all .25s;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateY(0)}
+
+/* ── SCROLLBAR ───────────────────────────────────────────────────── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(0,212,170,.2);border-radius:3px}
+
+/* ── MINI SPINNER ────────────────────────────────────────────────── */
+.spinner{width:14px;height:14px;border:2px solid rgba(13,27,42,.4);border-top-color:var(--navy);border-radius:50%;animation:spin .6s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TOGGLE SECTION ──────────────────────────────────────────────── */
+.toggle-head{
+  display:flex;align-items:center;justify-content:space-between;
+  cursor:pointer;padding:4px 0;
+  user-select:none;
+}
+.toggle-head:hover .toggle-icon{color:var(--teal)}
+.toggle-icon{color:var(--muted);font-size:12px;transition:transform .2s}
+.toggle-icon.open{transform:rotate(180deg)}
+.toggle-body{display:none;margin-top:10px}
+.toggle-body.open{display:block}
+</style>
+</head>
+<body>
+
+<div class="shell">
+<!-- ── SIDEBAR ─────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-name">🐰 Bonny Finance</div>
+    <div class="sb-logo-ver">Sistema v4.0 · 2026</div>
+  </div>
+
+  <div class="sb-section">Producción</div>
+  <button class="sb-btn active" onclick="nav('produccion')"><span class="sb-icon">⚡</span>Nuevo video</button>
+  <button class="sb-btn" onclick="nav('titulos')"><span class="sb-icon">📋</span>Títulos CTR</button>
+  <button class="sb-btn" onclick="nav('miniaturas')"><span class="sb-icon">🖼</span>Miniaturas</button>
+  <button class="sb-btn" onclick="nav('escenas')"><span class="sb-icon">🎬</span>54 Escenas</button>
+
+  <div class="sb-divider"></div>
+  <div class="sb-section">Estrategia</div>
+  <button class="sb-btn" onclick="nav('tendencias')"><span class="sb-icon">📈</span>Tendencias</button>
+  <button class="sb-btn" onclick="nav('curar')"><span class="sb-icon">🔬</span>Curar viral</button>
+  <button class="sb-btn" onclick="nav('analizar')"><span class="sb-icon">📊</span>Analizar canal</button>
+
+  <div class="sb-divider"></div>
+  <div class="sb-section">Sistema</div>
+  <button class="sb-btn" onclick="nav('calendario')"><span class="sb-icon">📅</span>Calendario</button>
+  <button class="sb-btn" onclick="nav('personaje')"><span class="sb-icon">🎨</span>Perfil de Bonny</button>
+  <button class="sb-btn" onclick="nav('instalar')"><span class="sb-icon">⚙</span>Instalación</button>
+</aside>
+
+<!-- ── MAIN ───────────────────────────────────────────────────── -->
+<main class="main">
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL: NUEVO VIDEO
+═════════════════════════════════════════════════════════════ -->
+<div class="panel active" id="p-produccion">
+  <div class="page-head">
+    <div class="page-title">⚡ Nuevo <span class="teal">Video</span></div>
+    <div class="page-sub">Completa el tema y el sistema genera el prompt ACTUALIZAR listo para pegar en Claude</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">01 — Tema del video</div>
+    <div class="form-group">
+      <label>Tema principal</label>
+      <input type="text" id="tema" placeholder="ej: Por qué tu tarjeta de débito te hace perder dinero">
+    </div>
+    <div class="form-row">
+      <div>
+        <label>Tipo de video</label>
+        <select id="tipo">
+          <option value="A">Tipo A — Educativo con afiliado integrado (70%)</option>
+          <option value="B">Tipo B — Review directa de producto (20%)</option>
+          <option value="C">Tipo C — Educativo puro sin afiliado (10%)</option>
+        </select>
+      </div>
+      <div>
+        <label>Afiliado (si aplica)</label>
+        <select id="afiliado">
+          <option value="">Ninguno</option>
+          <option value="Nu (tarjeta sin buró)">Nu — tarjeta sin buró</option>
+          <option value="Mercado Pago">Mercado Pago</option>
+          <option value="Hotmart — curso de finanzas">Hotmart — curso finanzas</option>
+          <option value="Clip — cobros para emprendedores">Clip — cobros emprendedores</option>
+          <option value="Amazon Afiliados">Amazon Afiliados</option>
+          <option value="Comparabien">Comparabien</option>
+          <option value="Otro (especificar en el tema)">Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Contexto extra (opcional)</label>
+      <input type="text" id="contexto" placeholder="ej: enfocado en México, incluir dato del INEGI, audiencia 25-35">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="genActualizar()">⚡ Generar prompt ACTUALIZAR</button>
+      <button class="btn btn-outline btn-sm" onclick="clearAll()">↺ Limpiar</button>
+    </div>
+  </div>
+
+  <div class="card" id="out-actualizar-card" style="display:none">
+    <div class="card-title">Prompt ACTUALIZAR — listo para copiar</div>
+    <div class="info-box">Copia este prompt completo y pégalo en tu <strong>Proyecto Bonny Finance en Claude.ai</strong></div>
+    <div class="output-header">
+      <span class="output-label">Prompt generado</span>
+      <button class="btn btn-copy btn-sm" onclick="copyOutput('out-actualizar')">📋 Copiar</button>
+    </div>
+    <div class="output-box" id="out-actualizar"></div>
+  </div>
+
+  <!-- Accesos rápidos -->
+  <div class="card">
+    <div class="card-title">Accesos rápidos</div>
+    <div class="grid-3">
+      <button class="btn btn-outline" style="justify-content:center" onclick="nav('titulos')">📋 Generar títulos</button>
+      <button class="btn btn-outline" style="justify-content:center" onclick="nav('miniaturas')">🖼 Generar miniatura</button>
+      <button class="btn btn-outline" style="justify-content:center" onclick="nav('escenas')">🎬 Generar 54 escenas</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL: TÍTULOS CTR
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="p-titulos">
+  <div class="page-head">
+    <div class="page-title">📋 Títulos <span class="teal">CTR</span></div>
+    <div class="page-sub">Genera 3 opciones de título optimizadas para máximo click-through rate</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos del video</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tema del video</label>
+        <input type="text" id="tit-tema" placeholder="ej: cómo salir de deudas en 6 meses">
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="tit-tipo">
+          <option value="A">Tipo A — Con afiliado</option>
+          <option value="B">Tipo B — Review</option>
+          <option value="C">Tipo C — Educativo puro</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Emoción principal</label>
+        <select id="tit-emocion">
+          <option value="dolor financiero">Dolor financiero</option>
+          <option value="curiosidad">Curiosidad</option>
+          <option value="miedo a perder">Miedo a perder</option>
+          <option value="esperanza y aspiración">Esperanza / aspiración</option>
+          <option value="sorpresa / revelación">Sorpresa / revelación</option>
+          <option value="urgencia">Urgencia</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Meta de vistas</label>
+        <select id="tit-meta">
+          <option value="200">200+ vistas (inicio)</option>
+          <option value="500">500+ vistas</option>
+          <option value="1000">1,000+ vistas</option>
+          <option value="5000">5,000+ vistas</option>
+        </select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="genTitulos()">📋 Generar 3 títulos CTR</button>
+    </div>
+  </div>
+
+  <div class="card" id="out-titulos-card" style="display:none">
+    <div class="card-title">Prompt TITULOS — listo para copiar</div>
+    <div class="info-box">Pega este prompt en Claude y recibirás 3 títulos clasificados por fórmula con el recomendado destacado</div>
+    <div class="output-header">
+      <span class="output-label">Prompt generado</span>
+      <button class="btn btn-copy btn-sm" onclick="copyOutput('out-titulos')">📋 Copiar</button>
+    </div>
+    <div class="output-box" id="out-titulos"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL: MINIATURAS
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="p-miniaturas">
+  <div class="page-head">
+    <div class="page-title">🖼 Miniaturas — <span class="teal">3 variantes</span></div>
+    <div class="page-sub">Genera 3 variantes emocionales de miniatura y elige la más impactante</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos de la miniatura</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tema del video</label>
+        <input type="text" id="min-tema" placeholder="ej: por qué nunca te alcanza el dinero">
+      </div>
+      <div class="form-group">
+        <label>Palabra clave del título</label>
+        <input type="text" id="min-keyword" placeholder="ej: DEUDA, AHORRA, NUNCA MÁS">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Emoción dominante del video</label>
+      <div class="chips" id="min-chips">
+        <span class="chip on" data-val="shock y preocupación">😱 Shock</span>
+        <span class="chip" data-val="esperanza y solución">✨ Esperanza</span>
+        <span class="chip" data-val="revelación y sorpresa">💡 Revelación</span>
+        <span class="chip" data-val="urgencia y alerta">⚠️ Urgencia</span>
+        <span class="chip" data-val="logro y confianza">🏆 Logro</span>
+        <span class="chip" data-val="frustración relatable">😤 Frustración</span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="genMiniaturas()">🖼 Generar 3 variantes</button>
+    </div>
+  </div>
+
+  <div class="card" id="out-min-card" style="display:none">
+    <div class="card-title">3 variantes de miniatura — prompts para Gemini</div>
+    <div class="warn-box">⚠️ Abre el <strong>Generador de Imágenes Gemini</strong> en otra pestaña, selecciona canal <strong>Bonny Finance</strong>, ratio <strong>16:9</strong>, y pega cada prompt por separado para comparar.</div>
+    <div class="output-header">
+      <span class="output-label">Prompts para el generador de imágenes</span>
+      <button class="btn btn-copy btn-sm" onclick="copyOutput('out-min')">📋 Copiar todo</button>
+    </div>
+    <div class="output-box" id="out-min"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL: 54 ESCENAS
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="p-escenas">
+  <div class="page-head">
+    <div class="page-title">🎬 54 Escenas — <span class="teal">Imágenes del video</span></div>
+    <div class="page-sub">Genera el prompt para que Claude produzca la lista completa de 54 escenas en formato v3.1</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos del video</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Tema del video</label>
+        <input type="text" id="esc-tema" placeholder="ej: cómo ahorrar el 30% de tu quincena">
+      </div>
+      <div class="form-group">
+        <label>Duración objetivo</label>
+        <select id="esc-dur">
+          <option value="8.5">8.5 min (51 escenas)</option>
+          <option value="9" selected>9 min (54 escenas)</option>
+          <option value="10">10 min (60 escenas)</option>
+          <option value="12">12 min (72 escenas)</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Momentos clave (opcional — ayuda a Claude a distribuir bien los tipos)</label>
+      <input type="text" id="esc-momentos" placeholder="ej: minuto 4 gráfico de ahorro, minuto 7 comparativa bancos">
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="genEscenas()">🎬 Generar prompt de 54 escenas</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Referencia — 3 tipos de escena</div>
+    <table class="tbl">
+      <thead><tr><th>Tipo</th><th>Cuándo usarlo</th><th>Proporción</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-teal">TIPO-A Narrativa</span></td><td>Bonny en situación. Sin texto ni gráficos.</td><td>~40% (22 escenas)</td></tr>
+        <tr><td><span class="badge badge-green">TIPO-B Infográfica</span></td><td>Gráfico + texto en español + Bonny.</td><td>~35% (19 escenas)</td></tr>
+        <tr><td><span class="badge badge-gold">TIPO-C Tipográfica</span></td><td>Texto grande en español como elemento central.</td><td>~25% (13 escenas)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" id="out-esc-card" style="display:none">
+    <div class="card-title">Prompt de 54 escenas — listo para copiar</div>
+    <div class="info-box">Pega en Claude → obtienes la lista completa → copia los prompts al generador Gemini</div>
+    <div class="output-header">
+      <span class="output-label">Prompt generado</span>
+      <button class="btn btn-copy btn-sm" onclick="copyOutput('out-esc')">📋 Copiar</button>
+    </div>
+    <div class="output-box" id="out-esc"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL: TENDENCIAS
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="p-tendencias">
+  <div class="page-head">
+    <div class="page-title">📈 <span class="teal">Tendencias</span> del nicho</div>
+    <div class="page-sub">Genera el prompt para que Claude analice qué temas están en tendencia en finanzas LATAM</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Configurar análisis</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>País o región foco</label>
+        <select id="tend-pais">
+          <option value="LATAM general">LATAM general</option>
+          <option value="México">México</option>
+          <option value="Colombia">Colombia</option>
+          <option value="Argentina">Argentina</option>
+          <option value="República Dominicana">República Dominicana</option>
+          <option value="Chile">Chile</option>
+          <option value="Perú">Perú</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Mes / período</label>
+        <input type="text" id="tend-mes" placeholder="ej: Abril 2026" value="Abril 2026">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Sub-nichos a explorar</label>
+      <div class="chips" id="tend-chips">
+        <span class="chip on" data-val="ahorro y quincena">💰 Ahorro</span>
+        <span class="chip on" data-val="deudas y crédito">💳 Deudas</span>
+        <span class="chip" data-val="inversiones para principiantes">📊 Inversiones</span>
+        <span class="chip" data-val="fintech LATAM">📱 Fintech</span>
+        <span class="chip" data-val="emprendimiento">🚀 Emprendimiento</span>
+        <span class="chip" data-val="inflación y economía">📉 Inflación</span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="genTendencias()">📈 Generar prompt de tendencias</button>
+    </div>
+  </div>
+
+  <div class="card" id="out-tend-card" style="display:none">
+    <div class="card-title">Prompt TENDENCIAS — listo para copiar</div>
+    <div class="output-header">
+      <span class="output-label">Prompt generado</span>
+      <button class="btn btn-copy btn-sm" onclick="copyOutput('out-tend')">📋 Copiar</button>
+    </div>
+    <div class="output-box" id="out-tend"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL: CURAR VIRAL
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="p-curar">
+  <div class="page-head">
+    <div class="page-title">🔬 Curar <span class="teal">viral</span></div>
+    <div class="page-sub">Pega transcripciones de videos virales del nicho y extrae los patrones replicables para Bonny</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Transcripciones virales</div>
+    <div class="info-box">Criterio: videos con +500K vistas en menos de 1 mes en finanzas LATAM. Para obtener la transcripción: abre el video en YouTube → ⋯ → Transcripción → Copiar todo</div>
+    <div class="form-group">
+      <label>Transcripción 1 (video más viral)</label>
+      <textarea id="cur-t1" rows="4" placeholder="Pega aquí la transcripción del primer video..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Transcripción 2</label>
+      <textarea id="cur-t2" rows="4" placeholder="Pega aquí la transcripción del segundo video..."></textarea>
+    </div>
+    <div class="form-group">
+      <label>Transcripción 3</label>
+      <textarea id="cur-t3" rows="4" placeholder="Pega aquí la transcripción del tercer video..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="genCurar()">🔬 Generar prompt CURAR</button>
+    </div>
+  </div>
+
+  <div class="card" id="out-curar-card" style="display:none">
+    <div class="card-title">Prompt CURAR — listo para copiar en Claude</div>
+    <div class="output-header">
+      <span class="output-label">Prompt generado</span>
+      <button class="btn btn-copy btn-sm" onclick="copyOutput('out-curar')">📋 Copiar</button>
+    </div>
+    <div class="output-box" id="out-curar"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL: ANALIZAR CANAL
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="p-analizar">
+  <div class="page-head">
+    <div class="page-title">📊 Analizar <span class="teal">Canal</span></div>
+    <div class="page-sub">Diagnóstico mensual del canal — qué funcionó, qué evitar, oportunidades</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Datos del período</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Mes analizado</label>
+        <input type="text" id="ana-mes" placeholder="ej: Marzo 2026">
+      </div>
+      <div class="form-group">
+        <label>Videos publicados</label>
+        <input type="text" id="ana-num" placeholder="ej: 4">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Video con más vistas</label>
+        <input type="text" id="ana-mejor" placeholder="ej: 'Por qué nunca te alcanza'">
+      </div>
+      <div class="form-group">
+        <label>Video con menos vistas</label>
+        <input type="text" id="ana-peor" placeholder="ej: 'Cómo abrir cuenta Nu'">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Observaciones (retención, CTR, comentarios destacados)</label>
+      <textarea id="ana-obs" rows="3" placeholder="ej: el video de tarjetas tuvo 65% retención al minuto 8, CTR 4.2%..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="genAnalizar()">📊 Generar prompt ANALIZAR</button>
+    </div>
+  </div>
+
+  <div class="card" id="out-ana-card" style="display:none">
+    <div class="card-title">Prompt ANALIZAR — listo para copiar</div>
+    <div class="output-header">
+      <span class="output-label">Prompt generado</span>
+      <button class="btn btn-copy btn-sm" onclick="copyOutput('out-ana')">📋 Copiar</button>
+    </div>
+    <div class="output-box" id="out-ana"></div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL: CALENDARIO
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="p-calendario">
+  <div class="page-head">
+    <div class="page-title">📅 Calendario <span class="teal">Semanal</span></div>
+    <div class="page-sub">Un video largo = 5 publicaciones = toda la semana cubierta</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Ciclo de publicación</div>
+    <table class="tbl">
+      <thead><tr><th>Día</th><th>Acción</th><th>Detalle</th><th>Hora</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Lunes</strong></td><td>🎬 Producción</td><td>Guión + prompts + voz + edición completa</td><td>Todo el día</td></tr>
+        <tr><td><strong>Martes</strong></td><td>📹 Video largo</td><td>Publicar video 10-12 min con SEO completo</td><td>7:00 PM</td></tr>
+        <tr><td><strong>Miércoles</strong></td><td>⚡ Short 1 — El Hook</td><td>Extraer 0:00–0:35. Dato más impactante.</td><td>6:00 PM</td></tr>
+        <tr><td><strong>Jueves</strong></td><td>⚡ Short 2 — El Error</td><td>Extraer 1:30–3:30. Momento más relatable.</td><td>6:00 PM</td></tr>
+        <tr><td><strong>Viernes</strong></td><td>⚡ Short 3 — El Análisis</td><td>Extraer 5:30–7:30. Dato más sorprendente.</td><td>6:00 PM</td></tr>
+        <tr><td><strong>Sábado</strong></td><td>⚡ Short 4 — La Solución</td><td>Extraer 8:00–10:00. Tip accionable.</td><td>6:00 PM</td></tr>
+        <tr><td><strong>Domingo</strong></td><td>📊 Métricas</td><td>Retención min 1, min 8, CTR, comentarios</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Estructura del video — timestamps</div>
+    <table class="tbl">
+      <thead><tr><th>Tiempo</th><th>Segmento</th><th>Función</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-red">0:00–0:35</span></td><td>🎣 Hook</td><td>Dato impactante. Retención &gt;70% requerida.</td></tr>
+        <tr><td>0:35–1:10</td><td>📢 Promesa</td><td>3 puntos concretos. Bonny a cámara.</td></tr>
+        <tr><td>1:10–1:30</td><td>🎬 Intro canal</td><td>Máximo 20 segundos.</td></tr>
+        <tr><td>1:30–3:30</td><td>❌ Problema</td><td>Historia cotidiana. El espectador se identifica.</td></tr>
+        <tr><td>3:30–5:30</td><td>📊 Datos</td><td>2-3 estadísticas. Mid-roll puede aparecer aquí.</td></tr>
+        <tr><td>5:30–7:30</td><td>🔍 Análisis</td><td>Explicación profunda. Bonny en modo aprendizaje.</td></tr>
+        <tr><td><span class="badge badge-red">7:30–8:00</span></td><td>⚡ Giro</td><td>Dato sorpresa. Tensión máxima antes del mid-roll.</td></tr>
+        <tr><td>8:00–10:00</td><td>✅ Solución</td><td>Pasos concretos. El contenido por el que llegaron.</td></tr>
+        <tr><td>10:00–11:30</td><td>📋 Resumen</td><td>3 puntos clave. Refuerza retención.</td></tr>
+        <tr><td>11:30–12:00</td><td>🎯 CTA</td><td>Comentarios + próximo video + suscripción.</td></tr>
+      </tbody>
+    </table>
+    <div class="warn-box" style="margin-top:12px;margin-bottom:0">⚠️ Regla de Oro: minuto 0:35 y minuto 8:00 son los dos puntos críticos que YouTube mide para distribución orgánica. Bonny debe estar en tensión máxima en ambos momentos.</div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL: PERFIL DE BONNY
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="p-personaje">
+  <div class="page-head">
+    <div class="page-title">🎨 Perfil de <span class="teal">Bonny</span></div>
+    <div class="page-sub">Referencia completa del personaje para consistencia visual</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Identidad visual</div>
+      <table class="tbl">
+        <tbody>
+          <tr><td>Género</td><td>Masculino</td></tr>
+          <tr><td>Edad visual</td><td>28–35 años (millennial)</td></tr>
+          <tr><td>Complexión</td><td>Delgado-promedio</td></tr>
+          <tr><td>Cabello</td><td>Negro, corto, ligeramente despeinado</td></tr>
+          <tr><td>Vestimenta</td><td>Camisa azul marino/blanca + pantalón casual</td></tr>
+          <tr><td>Piel (hex)</td><td><span class="badge" style="background:rgba(198,134,66,.15);color:#C68642;border:1px solid rgba(198,134,66,.3)">#C68642</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">Paleta del canal</div>
+      <table class="tbl">
+        <tbody>
+          <tr><td>Azul noche</td><td><span class="badge" style="background:rgba(26,26,46,.5);color:#a0a0c0;border:1px solid rgba(100,100,200,.3)">#1A1A2E</span></td></tr>
+          <tr><td>Dorado</td><td><span class="badge badge-gold">#F4A300</span></td></tr>
+          <tr><td>Verde dinero</td><td><span class="badge badge-green">#2ECC71</span></td></tr>
+          <tr><td>Fondo claro</td><td><span class="badge" style="background:rgba(245,245,245,.1);color:#ccc;border:1px solid rgba(200,200,200,.2)">#F5F5F5</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Prompt base del personaje — copiar siempre</div>
+    <div class="output-header">
+      <span class="output-label">Base prompt (inglés — mejor calidad en Gemini)</span>
+      <button class="btn btn-copy btn-sm" onclick="copyOutput('bonny-base')">📋 Copiar</button>
+    </div>
+    <div class="output-box" id="bonny-base">CHARACTER: A young Latin American man, 28-35 years old, lean-average build, short black slightly messy hair, warm brown skin (#C68642), wearing a plain navy blue shirt and casual pants. 2D flat design illustration for adult audience, semi-realistic clean lines, expressive eyes, mature adult face. NOT a child, NOT chibi, NOT kids cartoon. No suit, no tie — everyday working class look.
+
+STYLE: Flat design with soft shadows, vibrant but not saturated colors, professional content quality.
+
+PALETTE: Deep navy blue #1A1A2E backgrounds, golden yellow #F4A300 accents, money green #2ECC71 highlights, teal #00d4aa details.
+
+ATMOSPHERE: [INSERTAR AQUÍ: descripción de la escena, emoción, acción, entorno]</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Ejemplos de ATMOSPHERE por tipo de escena</div>
+    <table class="tbl">
+      <thead><tr><th>Tipo</th><th>Texto para ATMOSPHERE</th></tr></thead>
+      <tbody>
+        <tr><td>Hook — impacto</td><td>Bonny staring at his empty wallet with shock, floating dollar bills disappearing around him, dramatic lighting, close-up expression</td></tr>
+        <tr><td>Error financiero</td><td>Bonny looking stressed surrounded by credit card bills on a cluttered desk, worried expression, red glow, late night scene</td></tr>
+        <tr><td>Datos / infografía</td><td>Bonny pointing at a glowing bar chart floating in the air, curious focused expression, clean blue background, chart title reads "[TÍTULO EN ESPAÑOL]"</td></tr>
+        <tr><td>Solución</td><td>Bonny smiling with confidence, holding a glowing golden coin, green upward arrows in background, sunrise colors, victorious humble pose</td></tr>
+        <tr><td>CTA / cierre</td><td>Bonny looking directly at viewer with a knowing smile and subtle thumbs up, warm golden lighting, simple background with subtle money pattern</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Primeros 5 temas de lanzamiento</div>
+    <table class="tbl">
+      <thead><tr><th>#</th><th>Tema</th><th>Hook de apertura</th></tr></thead>
+      <tbody>
+        <tr><td>01</td><td>Por qué Bonny recibe su quincena y el viernes ya no tiene nada</td><td>Bonny llega al banco el viernes con su quincena completa. El lunes tiene $0.</td></tr>
+        <tr><td>02</td><td>Bonny quiere ahorrar $1,000 y descubre por qué nunca puede</td><td>¿Cuántas veces prometiste ahorrar este mes? Bonny también lo prometió. 11 veces seguidas.</td></tr>
+        <tr><td>03</td><td>La trampa del trabajo: 40 horas, quincena y siempre en cero</td><td>Bonny lleva 3 años trabajando sin faltar un día. Y sigue igual que cuando empezó.</td></tr>
+        <tr><td>04</td><td>Por qué el banco de Bonny le roba dinero sin que se dé cuenta</td><td>Tu banco cobra 4 comisiones diferentes cada mes. Bonny pagó $340 en un año.</td></tr>
+        <tr><td>05</td><td>Cuánto dinero necesita Bonny para no trabajar nunca más</td><td>Bonny hizo el cálculo a los 30 años. El número lo dejó sin palabras.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     PANEL: INSTALACIÓN
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="p-instalar">
+  <div class="page-head">
+    <div class="page-title">⚙ <span class="teal">Instalación</span></div>
+    <div class="page-sub">Cómo configurar este sistema en GitHub Pages — permanente y gratuito</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Pasos de instalación</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-body">
+          <div class="step-title">Descarga este archivo HTML</div>
+          <div class="step-desc">Guarda este archivo como <code style="background:rgba(0,212,170,.1);padding:1px 5px;border-radius:3px;color:var(--teal)">index.html</code> en tu computadora. El nombre debe ser exactamente ese.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-body">
+          <div class="step-title">Crea un repositorio en GitHub</div>
+          <div class="step-desc">Ve a <strong>github.com</strong> → New → Nombre: <strong>bonny-sistema</strong> → Public → Add README → Create repository</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-body">
+          <div class="step-title">Sube el archivo index.html</div>
+          <div class="step-desc">Dentro del repositorio → Add file → Upload files → arrastra el <strong>index.html</strong> → Commit changes</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-body">
+          <div class="step-title">Activa GitHub Pages</div>
+          <div class="step-desc">Settings → Pages → Branch: main → / (root) → Save. Espera 2-3 minutos. Tu URL será: <strong>https://tuusuario.github.io/bonny-sistema</strong></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">5</div>
+        <div class="step-body">
+          <div class="step-title">Configura el Proyecto Bonny en Claude.ai</div>
+          <div class="step-desc">En Claude.ai → Projects → Bonny Finance → Instructions. El sistema de producción v4.0 debe estar como instrucciones del proyecto para que los prompts funcionen correctamente.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">6</div>
+        <div class="step-body">
+          <div class="step-title">Flujo de trabajo diario</div>
+          <div class="step-desc">Abre este sistema en tu URL de GitHub → genera el prompt → cópialo con 1 clic → pégalo en Claude.ai (plan Pro que ya tienes) → copia el resultado → listo.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Flujo completo de un video</div>
+    <table class="tbl">
+      <thead><tr><th>Paso</th><th>Herramienta</th><th>Acción</th><th>Tiempo</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Este sistema</td><td>Generar prompt ACTUALIZAR con el tema</td><td>2 min</td></tr>
+        <tr><td>2</td><td>Claude.ai</td><td>Pegar prompt → obtener guión + 54 escenas</td><td>15 min</td></tr>
+        <tr><td>3</td><td>Este sistema</td><td>Generar 3 títulos CTR</td><td>2 min</td></tr>
+        <tr><td>4</td><td>Claude.ai</td><td>Elegir el título ganador</td><td>2 min</td></tr>
+        <tr><td>5</td><td>Este sistema</td><td>Generar 3 variantes de miniatura</td><td>2 min</td></tr>
+        <tr><td>6</td><td>Generador Gemini</td><td>Generar las 54 imágenes + ZIP</td><td>30 min</td></tr>
+        <tr><td>7</td><td>CapCut</td><td>Ensamblar video con TTS + imágenes</td><td>45 min</td></tr>
+        <tr><td>8</td><td>YouTube Studio</td><td>Subir con descripción SEO + tags</td><td>10 min</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Costo del sistema</div>
+    <div class="grid-3">
+      <div class="mini-card">
+        <div class="mini-card-label">Este sistema HTML</div>
+        <div class="mini-card-val">$0</div>
+        <div class="mini-card-sub">GitHub Pages — gratis permanente</div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-label">Claude.ai</div>
+        <div class="mini-card-val">Plan Pro</div>
+        <div class="mini-card-sub">Ya lo tienes — no hay costo extra</div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-label">Gemini (imágenes)</div>
+        <div class="mini-card-val">$0</div>
+        <div class="mini-card-sub">1500 imágenes/día Tier 1 gratis</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div><!-- /shell -->
+
+<div id="toast">✓ Copiado al portapapeles</div>
+
+<!-- ── SCRIPTS ────────────────────────────────────────────────────── -->
+<script>
+// ── NAVIGATION ────────────────────────────────────────────────────
+function nav(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+  var panel=document.getElementById('p-'+id);
+  if(panel) panel.classList.add('active');
+  var btn=document.querySelector('.sb-btn[onclick="nav(\''+id+'\')"]');
+  if(btn) btn.classList.add('active');
+  document.querySelector('.main').scrollTop=0;
+  window.scrollTo(0,0);
+}
+
+// ── CHIPS ─────────────────────────────────────────────────────────
+document.querySelectorAll('.chips').forEach(function(c){
+  c.querySelectorAll('.chip').forEach(function(ch){
+    ch.addEventListener('click',function(){
+      this.classList.toggle('on');
+    });
+  });
+});
+
+function getChips(containerId){
+  var vals=[];
+  document.querySelectorAll('#'+containerId+' .chip.on').forEach(function(c){ vals.push(c.dataset.val||c.textContent.trim()); });
+  return vals;
+}
+
+// ── OUTPUT / COPY ─────────────────────────────────────────────────
+function setOutput(id, text, cardId){
+  var el=document.getElementById(id);
+  if(el) el.textContent=text;
+  if(cardId){
+    var card=document.getElementById(cardId);
+    if(card) card.style.display='block';
+  }
+}
+
+function copyOutput(id){
+  var el=document.getElementById(id);
+  if(!el) return;
+  var txt=el.textContent||el.innerText;
+  navigator.clipboard.writeText(txt).then(function(){
+    showToast();
+  }).catch(function(){
+    var ta=document.createElement('textarea');
+    ta.value=txt; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast();
+  });
+}
+
+function showToast(){
+  var t=document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2000);
+}
+
+function clearAll(){
+  ['tema','tipo','afiliado','contexto'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.value=el.tagName==='SELECT'?el.options[0].value:'';
+  });
+  setOutput('out-actualizar','');
+  var card=document.getElementById('out-actualizar-card');
+  if(card) card.style.display='none';
+}
+
+// ── GENERADORES DE PROMPT ─────────────────────────────────────────
+
+// ACTUALIZAR
+function genActualizar(){
+  var tema=document.getElementById('tema').value.trim();
+  var tipo=document.getElementById('tipo').value;
+  var afiliado=document.getElementById('afiliado').value;
+  var ctx=document.getElementById('contexto').value.trim();
+  if(!tema){ alert('Ingresa el tema del video'); return; }
+
+  var prompt=
+`ACTUALIZAR ${tema} Tipo-${tipo}${afiliado?' '+afiliado:''}
+
+---
+
+Usa el sistema Bonny Finance v4.0 completo. Genera:
+
+1. CLASIFICACIÓN DEL VIDEO
+   - Tipo ${tipo === 'A' ? 'A (Educativo con afiliado integrado narrativamente)' : tipo === 'B' ? 'B (Review directa de producto)' : 'C (Educativo puro sin afiliado)'}
+   ${afiliado ? '- Afiliado: '+afiliado : '- Sin afiliado en este video'}
+
+2. METADATA SEO
+   - Título (máx 60 caracteres, con keyword principal)
+   - Descripción (primeras 2 líneas con keyword + CTA si aplica)
+   - 10 tags relevantes
+
+3. GUIÓN COMPLETO — 8 a 12 minutos | 1,200 a 1,800 palabras
+   [HOOK - 0 a 30 seg] Situación dolorosa de Bonny. Pregunta directa al espectador.
+   [PROBLEMA - 30 seg a 2 min] Por qué la mayoría falla. Dato + anécdota de Bonny.
+   [PROMESA - 2 a 3 min] Qué aprenderán hoy. Por qué es diferente.
+   [DESARROLLO - 3 a 6 min] Enseñanza principal. Pasos concretos que Bonny aplica.
+   ${afiliado ? '[CTA AFILIADO - 6 a 7 min] Bonny usa '+afiliado+' de forma narrativa, NO como publicidad explícita.' : ''}
+   [REFUERZO - 7 a 9 min] Consecuencias de aplicar vs no aplicar.
+   [CIERRE - 9 a 12 min] Resumen 3 puntos. CTA suscripción. Teaser próximo video.
+
+4. LISTA DE 54 ESCENAS — FORMATO v3.1
+   Reglas obligatorias:
+   - Prompt SIEMPRE en inglés
+   - Texto visible en la imagen SIEMPRE en español
+   - Asignar tipo: TIPO-A (40%), TIPO-B (35%), TIPO-C (25%)
+   
+   Formato: ESCENA [N] | TIPO-[A/B/C] | [Prompt en inglés. Texto en imagen entre comillas en español.]
+   
+   TIPO-A: Solo Bonny en situación narrativa. Sin texto ni gráficos.
+   TIPO-B: Gráfico/infográfico + texto en español + Bonny señalando.
+   TIPO-C: Texto tipográfico grande en español como elemento principal.
+   
+   Prefijo obligatorio en TODAS las escenas — personaje Bonny:
+   Young adult Latin American man late 20s, short black slightly messy hair, 
+   warm brown skin #C68642, plain navy shirt and casual pants, mature adult face,
+   NOT a child, NOT chibi. Palette: teal #00d4aa and navy #1A1A2E.
+
+5. PROMPT DE THUMBNAIL
+   - Bonny con expresión según el tema
+   - Texto principal en español (máx 4 palabras, fuente grande)
+   - Fondo color sólido o gradiente
+${ctx ? '\nCONTEXTO ADICIONAL: '+ctx : ''}`;
+
+  setOutput('out-actualizar', prompt, 'out-actualizar-card');
+}
+
+// TÍTULOS CTR
+function genTitulos(){
+  var tema=document.getElementById('tit-tema').value.trim();
+  var tipo=document.getElementById('tit-tipo').value;
+  var emocion=document.getElementById('tit-emocion').value;
+  var meta=document.getElementById('tit-meta').value;
+  if(!tema){ alert('Ingresa el tema del video'); return; }
+
+  var prompt=
+`TITULOS '${tema}' Tipo-${tipo} meta-${meta}-vistas
+
+ROL: Eres un ingeniero de títulos de YouTube especializado en finanzas personales LATAM.
+Canal: Bonny Finance | Audiencia: 25-45 años, clase trabajadora LATAM | CTR objetivo: >5%
+
+Tema: ${tema}
+Emoción dominante: ${emocion}
+Tipo de video: ${tipo === 'A' ? 'A — Educativo con afiliado' : tipo === 'B' ? 'B — Review directa' : 'C — Educativo puro'}
+
+Genera exactamente esto:
+
+1. ANÁLISIS DEL TEMA (2 líneas)
+   - Emoción primaria que activa el clic
+   - Keyword principal y volumen estimado LATAM
+
+2. TÍTULO FORMATO PROBLEMA/SOLUCIÓN (variante 1)
+   Formato: [Situación dolorosa] + [Promesa de salida]
+   Máx 60 caracteres.
+
+3. TÍTULO FORMATO DATO IMPACTANTE (variante 2)
+   Formato: [Número o % sorprendente] + [Consecuencia o revelación]
+   Máx 60 caracteres.
+
+4. TÍTULO FORMATO BONNY PERSONAL (variante 3)
+   Formato: Bonny en primera persona o referencia directa
+   Máx 60 caracteres.
+
+5. TÍTULO RECOMENDADO + RAZÓN
+   Cuál de los 3 tiene mayor probabilidad de superar CTR objetivo y por qué.
+
+6. TEXTO DEL THUMBNAIL alineado con el título recomendado (máx 4 palabras en MAYÚSCULAS)`;
+
+  setOutput('out-titulos', prompt, 'out-titulos-card');
+}
+
+// MINIATURAS
+function genMiniaturas(){
+  var tema=document.getElementById('min-tema').value.trim();
+  var keyword=document.getElementById('min-keyword').value.trim()||'DINERO';
+  var chips=getChips('min-chips');
+  var emocion=chips.length>0?chips[0]:'shock y preocupación';
+  if(!tema){ alert('Ingresa el tema del video'); return; }
+
+  var bonnyBase='Young adult Latin American man 28-35yo, short black messy hair, warm brown skin #C68642, navy shirt and casual pants, mature adult face NOT a child NOT chibi, 2D flat design adult illustration, palette teal #00d4aa and navy #1A1A2E';
+
+  var out=
+`=== MINIATURA VARIANTE 1 — EMOCIÓN: ${emocion.toUpperCase()} ===
+${bonnyBase}, ${emocion} expression, close-up face showing strong emotion about personal finance, bold Spanish text overlay "${keyword.toUpperCase()}" in large white bold typography top center, dramatic lighting, YouTube thumbnail composition 16:9.
+
+=== MINIATURA VARIANTE 2 — CON ELEMENTO VISUAL ===
+${bonnyBase}, pointing at a floating visual element related to "${tema}", surprised expression, bold Spanish text "${keyword.toUpperCase()}" in large teal bold font, dark navy background with golden accent glow, YouTube thumbnail quality 16:9.
+
+=== MINIATURA VARIANTE 3 — SPLIT SCREEN ===
+Split screen flat design: left side dark red tones showing the problem related to "${tema}", right side teal tones showing Bonny with confident expression holding coins or chart, bold Spanish text "${keyword.toUpperCase()}" centered in white, dark navy dividing line, 16:9 YouTube thumbnail.
+
+---
+RECOMENDACIÓN: La variante que mejor corresponde a "${emocion}" y mayor CTR potencial es la Variante 1 por el close-up emocional. Usa las 3 en el generador Gemini y elige la más impactante visualmente.`;
+
+  setOutput('out-min', out, 'out-min-card');
+}
+
+// 54 ESCENAS
+function genEscenas(){
+  var tema=document.getElementById('esc-tema').value.trim();
+  var dur=document.getElementById('esc-dur').value;
+  var momentos=document.getElementById('esc-momentos').value.trim();
+  var n=Math.round(parseFloat(dur)*6);
+  if(!tema){ alert('Ingresa el tema del video'); return; }
+
+  var prompt=
+`Genera la lista completa de ${n} escenas para el video de Bonny Finance sobre:
+"${tema}"
+Duración: ${dur} minutos | ${n} escenas (1 por cada 10 segundos)
+${momentos?'Momentos clave: '+momentos:''}
+
+REGLAS OBLIGATORIAS:
+- Prompts SIEMPRE en inglés (mayor calidad en Gemini)
+- Texto visible en imagen SIEMPRE en español
+- Distribuir: TIPO-A 40% (${Math.round(n*0.4)} esc) / TIPO-B 35% (${Math.round(n*0.35)} esc) / TIPO-C 25% (${Math.round(n*0.25)} esc)
+
+TIPOS:
+TIPO-A: Solo Bonny en situación narrativa. Sin texto ni gráficos en imagen.
+TIPO-B: Gráfico/infografía + texto en español entre comillas + Bonny señalando.
+TIPO-C: Texto tipográfico grande en español como elemento visual principal.
+
+PREFIJO BONNY (incluir en TODAS las escenas TIPO-A):
+Young adult Latin American man late 20s, short black slightly messy hair,
+warm brown skin #C68642, plain navy shirt and casual pants, mature adult face,
+NOT a child NOT chibi. Style: 2D flat design adult illustration.
+Palette: teal #00d4aa and navy #1A1A2E.
+
+FORMATO DE CADA ESCENA:
+ESCENA [N] | TIPO-[A/B/C] | [Prompt en inglés. Texto en imagen entre "comillas" en español si aplica.]
+
+ESTRUCTURA DE DISTRIBUCIÓN:
+- Escenas 01-03: Hook — TIPO-A o TIPO-C (tensión máxima)
+- Escenas 04-10: Problema — TIPO-A + 1-2 TIPO-B con datos
+- Escenas 11-20: Datos — principalmente TIPO-B
+- Escenas 21-32: Análisis — mix TIPO-A y TIPO-B
+- Escenas 33-36: Giro — TIPO-C impactante
+- Escenas 37-48: Solución — TIPO-B pasos + TIPO-A Bonny aplicando
+- Escenas 49-54: Resumen y CTA — TIPO-C + TIPO-A
+
+Genera las ${n} escenas numeradas con este formato exacto.`;
+
+  setOutput('out-esc', prompt, 'out-esc-card');
+}
+
+// TENDENCIAS
+function genTendencias(){
+  var pais=document.getElementById('tend-pais').value;
+  var mes=document.getElementById('tend-mes').value.trim()||'Abril 2026';
+  var chips=getChips('tend-chips');
+  var subnichos=chips.join(', ')||'ahorro, deudas, inversiones';
+
+  var prompt=
+`TENDENCIAS ${mes} ${pais}
+
+ROL: Eres un analista de contenido especializado en finanzas personales LATAM para YouTube.
+Canal: Bonny Finance | Audiencia: trabajadores 25-45 años clase media-baja LATAM
+
+Analiza el panorama de ${mes} para ${pais} y entrega:
+
+1. TOP 5 TEMAS EN TENDENCIA
+   - Tema + por qué está en tendencia ahora (evento económico, estación, etc.)
+   - Volumen de búsqueda estimado
+   - Nivel de competencia (bajo/medio/alto)
+   - Ángulo narrativo específico para Bonny
+
+2. SUB-NICHOS A EXPLORAR: ${subnichos}
+   Para cada uno: oportunidad actual + tema concreto + hook de apertura
+
+3. TEMAS EVERGREEN para el mes
+   - 2 temas con búsqueda constante que nunca caducan
+
+4. RECOMENDACIÓN DE CALENDARIO
+   - Qué video publicar primero y por qué
+   - Qué tema guardar para el siguiente mes
+
+5. AFILIADO RECOMENDADO
+   - Qué afiliado tiene mejor conversión potencial este mes y por qué`;
+
+  setOutput('out-tend', prompt, 'out-tend-card');
+}
+
+// CURAR
+function genCurar(){
+  var t1=document.getElementById('cur-t1').value.trim();
+  var t2=document.getElementById('cur-t2').value.trim();
+  var t3=document.getElementById('cur-t3').value.trim();
+  if(!t1){ alert('Pega al menos la primera transcripción'); return; }
+
+  var prompt=
+`CURAR
+
+ROL: Eres un analista forense de guiones e ingeniero inverso especializado en YouTube finanzas LATAM.
+Extrae TODOS los patrones replicables para el canal Bonny Finance.
+
+TRANSCRIPCIÓN 1:
+${t1}
+
+TRANSCRIPCIÓN 2:
+${t2||'[No proporcionada]'}
+
+TRANSCRIPCIÓN 3:
+${t3||'[No proporcionada]'}
+
+Analiza y entrega:
+
+1. PATRÓN DE GANCHO (primeros 30 segundos)
+   - Estructura exacta de apertura en los videos
+   - Fórmula común entre ellos
+   - Template replicable para Bonny: [_____]
+
+2. PATRÓN DE PROMESA (minuto 1-3)
+   - Cómo plantean el beneficio sin revelar la solución
+   - Palabras y frases de mayor impacto
+   - Template para Bonny: [_____]
+
+3. PATRÓN DE DESARROLLO
+   - Estructura lógica A→B→C
+   - Uso de números, pasos, anécdotas vs datos
+   - Ritmo: duración por bloque
+
+4. PATRÓN DE CTA
+   - Cómo integran el llamado a la acción sin interrumpir
+   - Frases de transición exactas
+   - Adaptación para CTA de afiliado de Bonny
+
+5. PATRÓN LINGÜÍSTICO
+   - Nivel de vocabulario (escala 1-10 de simplicidad)
+   - Metáforas y analogías que funcionan
+   - Frases de conectividad más usadas
+
+6. TOP 5 PATRONES CRÍTICOS
+   Lista priorizada listos para usar como instrucciones adicionales en el próximo ACTUALIZAR`;
+
+  setOutput('out-curar', prompt, 'out-curar-card');
+}
+
+// ANALIZAR
+function genAnalizar(){
+  var mes=document.getElementById('ana-mes').value.trim()||'el mes pasado';
+  var num=document.getElementById('ana-num').value.trim()||'4';
+  var mejor=document.getElementById('ana-mejor').value.trim()||'no especificado';
+  var peor=document.getElementById('ana-peor').value.trim()||'no especificado';
+  var obs=document.getElementById('ana-obs').value.trim();
+
+  var prompt=
+`ANALIZAR ${mes} ${num}-videos '${mejor}' '${peor}'
+
+ROL: Eres el analista de canal de Bonny Finance. Diagnostica el período con precisión.
+
+Período: ${mes}
+Videos publicados: ${num}
+Video con más vistas: ${mejor}
+Video con menos vistas: ${peor}
+${obs?'Observaciones adicionales: '+obs:''}
+
+Entrega:
+
+1. DIAGNÓSTICO DE RENDIMIENTO
+   - Qué funcionó y por qué (basado en los datos del mejor video)
+   - Qué falló y por qué (basado en los datos del peor video)
+   - Patrón identificado entre los ${num} videos
+
+2. ANÁLISIS DE TÍTULOS
+   - Qué palabras/emociones activaron más clics
+   - Qué formatos de título evitar el próximo mes
+
+3. PATRÓN DE HOOKS
+   - Qué tipo de gancho retuvo más (dolor / curiosidad / sorpresa)
+   - Recomendación de estructura de gancho para el próximo mes
+
+4. OPORTUNIDADES IDENTIFICADAS
+   - 3 temas con alta búsqueda y baja competencia para el mes siguiente
+   - 1 tema evergreen que merece versión larga (15+ min)
+
+5. AJUSTE DE AFILIADOS
+   - Qué afiliado convirtió mejor este mes
+   - Recomendación de afiliado a priorizar el próximo mes
+
+6. PLAN DE ACCIÓN
+   - Los 3 cambios más importantes para el próximo mes`;
+
+  setOutput('out-ana', prompt, 'out-ana-card');
+}
+</script>
+</body>
+</html>
