@@ -1812,7 +1812,7 @@ function updateStatus() {
   }
 }
 
-// --- 1. MOTOR DE NAVEGACIÓN (Repara la interfaz) ---
+// --- 1. NAVEGACIÓN (Repara la interfaz y los botones) ---
 function nav(panelId) {
   const paneles = document.querySelectorAll('.panel');
   const botones = document.querySelectorAll('.sb-btn');
@@ -1823,13 +1823,14 @@ function nav(panelId) {
   const target = document.getElementById('p-' + panelId);
   if (target) {
     target.classList.add('active');
+    // Iluminar el botón correcto
     const btnActivo = document.querySelector(`[onclick*="nav('${panelId}')"]`);
     if(btnActivo) btnActivo.classList.add('active');
   }
   window.scrollTo(0, 0);
 }
 
-// --- 2. CONEXIÓN MAESTRA CON GEMINI (Repara el error Not Found) ---
+// --- 2. MOTOR DE IA (Resuelve el error "Model not found") ---
 async function runOrquestador() {
   const tema = document.getElementById('oq-tema').value;
   if (!tema) { showToast("⚠️ Escribe un tema"); return; }
@@ -1839,7 +1840,7 @@ async function runOrquestador() {
   btn.innerHTML = '<span class="spinner"></span> Conectando...';
   btn.disabled = true;
 
-  const prompt = `Actúa como Director de Producción de Bonny Finance. Genera un JSON maestro para un video sobre: "${tema}". Responde ÚNICAMENTE el objeto JSON puro.`;
+  const prompt = `Actúa como Director de Producción. Genera un JSON maestro para un video sobre: "${tema}". Responde ÚNICAMENTE el objeto JSON puro.`;
 
   await conectarConIA(prompt, btn, originalText);
 }
@@ -1850,14 +1851,11 @@ async function conectarConIA(prompt, btn, originalText) {
   
   if (!apiKey) {
     alert("Configura tu API Key en la barra lateral.");
-    resetBtn(btn, originalText);
+    if(btn) { btn.innerHTML = originalText; btn.disabled = false; }
     return;
   }
 
-  targetEl.innerText = "🐰 Bonny está procesando en la nube...";
-
-  // INVESTIGACIÓN APLICADA: Forzamos v1beta y el alias -latest
-  // Esta es la ÚNICA URL que Google acepta hoy para Flash 1.5 sin dar error 404
+  // URL DE ALTA COMPATIBILIDAD (Forzamos v1beta para Flash 1.5)
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
   try {
@@ -1885,15 +1883,11 @@ async function conectarConIA(prompt, btn, originalText) {
     targetEl.innerText = "❌ Error de Google: " + err.message;
     showToast("Error en la conexión");
   } finally {
-    resetBtn(btn, originalText);
+    if(btn) { btn.innerHTML = originalText; btn.disabled = false; }
   }
 }
 
-function resetBtn(btn, txt) {
-  if(btn) { btn.innerHTML = txt; btn.disabled = false; }
-}
-
-// --- 3. UTILIDADES DE CIERRE Y EXPORTACIÓN ---
+// --- 3. UTILIDADES DE CIERRE ---
 function exportarJSON() {
   if (!jsonMaestroData) { showToast("❌ No hay datos"); return; }
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonMaestroData, null, 2));
@@ -1910,9 +1904,10 @@ function copyOutput(id) {
 
 function showToast(msj) {
   const t = document.getElementById('toast');
-  if(!t) return;
-  t.innerText = msj; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+  if(t) {
+    t.innerText = msj; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
 }
 
 function saveApiKey() {
