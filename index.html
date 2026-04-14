@@ -1812,19 +1812,14 @@ function updateStatus() {
   }
 }
 
-// --- 1. FUNCIÓN DE NAVEGACIÓN (Repara los botones de la izquierda) ---
-// --- 1. FUNCIÓN DE NAVEGACIÓN (Repara los botones de la izquierda) ---
+// --- 1. NAVEGACIÓN (Repara los botones de la izquierda) ---
 function nav(panelId) {
-  // Ocultar todos los paneles
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  // Desmarcar todos los botones
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   
-  // Mostrar el panel que corresponde
   const target = document.getElementById('p-' + panelId);
   if (target) {
     target.classList.add('active');
-    // Marcar el botón que se tocó
     if (event && event.currentTarget) {
       event.currentTarget.classList.add('active');
     }
@@ -1832,7 +1827,7 @@ function nav(panelId) {
   window.scrollTo(0, 0);
 }
 
-// --- 2. EL MOTOR DE GEMINI (Repara el error "Model not found") ---
+// --- 2. MOTOR IA (Repara el error "Model not found") ---
 async function runOrquestador() {
   const tema = document.getElementById('oq-tema').value;
   if (!tema) { showToast("⚠️ Escribe un tema"); return; }
@@ -1842,7 +1837,7 @@ async function runOrquestador() {
   btn.innerHTML = '<span class="spinner"></span> Procesando...';
   btn.disabled = true;
 
-  const prompt = `Actúa como Director de Producción de Bonny Finance. Genera un JSON maestro para un video sobre: "${tema}". Responde ÚNICAMENTE el objeto JSON.`;
+  const prompt = `Actúa como Director de Producción de Bonny Finance. Genera un JSON maestro para un video sobre: "${tema}". Responde únicamente el objeto JSON.`;
 
   await conectarConIA(prompt, 'oq-json-out', btn, originalText);
 }
@@ -1858,15 +1853,17 @@ async function conectarConIA(prompt, targetId, btn, originalText) {
   const targetEl = document.getElementById(targetId);
   targetEl.innerText = "🐰 Bonny está analizando...";
 
-  // URL DE CONEXIÓN SEGURA
-  // Cambiamos a v1 (más estable) en lugar de v1beta para evitar el error de modelo
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  // SOLUCIÓN DEFINITIVA AL ERROR: Usamos el modelo 'gemini-pro' que es el más compatible
+  // en la versión v1 de la API para evitar conflictos de "not found"
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
 
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
     });
 
     const data = await response.json();
@@ -1874,7 +1871,6 @@ async function conectarConIA(prompt, targetId, btn, originalText) {
     if (data.error) throw new Error(data.error.message);
 
     const resText = data.candidates[0].content.parts[0].text;
-    // Limpiar posibles marcas de código Markdown
     const cleanJson = resText.replace(/```json/g, "").replace(/```/g, "").trim();
     
     targetEl.innerText = cleanJson;
@@ -1885,8 +1881,8 @@ async function conectarConIA(prompt, targetId, btn, originalText) {
 
   } catch (err) {
     console.error(err);
-    targetEl.innerText = "Error Gemini: " + err.message;
-    showToast("❌ Error de conexión");
+    targetEl.innerText = "Error: " + err.message;
+    showToast("❌ Falló la conexión");
   } finally {
     if(btn) {
       btn.innerHTML = originalText;
@@ -1895,7 +1891,7 @@ async function conectarConIA(prompt, targetId, btn, originalText) {
   }
 }
 
-// --- 3. UTILIDADES ---
+// --- 3. UTILIDADES Y CIERRE ---
 function exportarJSON() {
   if (!jsonMaestroData) { showToast("❌ No hay datos"); return; }
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonMaestroData, null, 2));
