@@ -1812,10 +1812,13 @@ function updateStatus() {
   }
 }
 
-// --- 1. NAVEGACIÓN (Repara los botones de la sidebar) ---
+// --- 1. NAVEGACIÓN (Repara los botones de la izquierda) ---
 function nav(panelId) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  const paneles = document.querySelectorAll('.panel');
+  const botones = document.querySelectorAll('.sb-btn');
+  
+  paneles.forEach(p => p.classList.remove('active'));
+  botones.forEach(b => b.classList.remove('active'));
   
   const target = document.getElementById('p-' + panelId);
   if (target) {
@@ -1827,7 +1830,7 @@ function nav(panelId) {
   window.scrollTo(0, 0);
 }
 
-// --- 2. MOTOR DE INTELIGENCIA (Solución al error "Not Found") ---
+// --- 2. EL MOTOR DE CONEXIÓN INTELIGENTE ---
 async function runOrquestador() {
   const tema = document.getElementById('oq-tema').value;
   if (!tema) { showToast("⚠️ Escribe un tema"); return; }
@@ -1837,57 +1840,63 @@ async function runOrquestador() {
   btn.innerHTML = '<span class="spinner"></span> Conectando...';
   btn.disabled = true;
 
-  const prompt = `Actúa como Director de Producción de Bonny Finance. Genera un JSON maestro para un video sobre: "${tema}". Responde ÚNICAMENTE el objeto JSON puro.`;
+  const prompt = `Actúa como Director de Producción. Genera un JSON maestro para un video sobre: "${tema}". Responde solo el JSON puro.`;
 
-  // SISTEMA DE RUTEO AUTOMÁTICO
+  // Intentamos la conexión con autoreparación
+  await conectarConAutoreparacion(prompt, btn, originalText);
+}
+
+async function conectarConAutoreparacion(prompt, btn, originalText) {
+  const apiKey = localStorage.getItem('bonny_api_key');
+  if (!apiKey) { 
+    alert("Configura tu API Key"); 
+    resetBtn(btn, originalText);
+    return; 
+  }
+
+  const out = document.getElementById('oq-json-out');
+  out.innerText = "🐰 Bonny está buscando la mejor ruta de conexión...";
+
+  // LISTA DE RUTAS (Probamos v1beta primero porque Flash 1.5 vive ahí)
   const rutas = [
-    { v: 'v1beta', m: 'gemini-1.5-flash' }, // Ruta más probable para Flash
-    { v: 'v1',     m: 'gemini-pro' },       // Ruta de alta compatibilidad
-    { v: 'v1beta', m: 'gemini-pro' }        // Ruta de respaldo
+    { url: "v1beta/models/gemini-1.5-flash" },
+    { url: "v1/models/gemini-pro" }
   ];
 
-  let logrado = false;
   for (let ruta of rutas) {
-    console.log(`Intentando conectar via ${ruta.v} con ${ruta.m}...`);
-    logrado = await intentarLlamada(prompt, ruta.v, ruta.m);
-    if (logrado) break;
+    try {
+      console.log("Probando ruta: " + ruta.url);
+      const response = await fetch(`https://generativelanguage.googleapis.com/${ruta.url}:generateContent?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+      });
+
+      const data = await response.json();
+      
+      if (!data.error && data.candidates) {
+        const resText = data.candidates[0].content.parts[0].text;
+        const cleanJson = resText.replace(/```json/g, "").replace(/```/g, "").trim();
+        out.innerText = cleanJson;
+        procesarRespuestaOrquestador(cleanJson);
+        showToast("✨ ¡Conexión establecida via " + ruta.url + "!");
+        resetBtn(btn, originalText);
+        return; // Éxito, salimos de la función
+      }
+    } catch (e) {
+      console.error("Fallo en ruta " + ruta.url);
+    }
   }
 
-  if (!logrado) {
-    document.getElementById('oq-json-out').innerText = "❌ Error crítico: Ningún modelo respondió. Verifica que tu API Key sea de Google AI Studio.";
-  }
-
-  btn.innerHTML = originalText;
-  btn.disabled = false;
+  out.innerText = "❌ Error: Ninguna ruta de Google funcionó. Revisa si tu API Key es válida.";
+  resetBtn(btn, originalText);
 }
 
-async function intentarLlamada(prompt, version, modelo) {
-  const apiKey = localStorage.getItem('bonny_api_key');
-  const url = `https://generativelanguage.googleapis.com/${version}/models/${modelo}:generateContent?key=${apiKey}`;
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    });
-
-    const data = await response.json();
-    if (data.error) return false;
-
-    const resText = data.candidates[0].content.parts[0].text;
-    const cleanJson = resText.replace(/```json/g, "").replace(/```/g, "").trim();
-    
-    document.getElementById('oq-json-out').innerText = cleanJson;
-    procesarRespuestaOrquestador(cleanJson);
-    showToast("✨ Conexión Exitosa");
-    return true;
-  } catch (e) {
-    return false;
-  }
+function resetBtn(btn, txt) {
+  if(btn) { btn.innerHTML = txt; btn.disabled = false; }
 }
 
-// --- 3. UTILIDADES Y CIERRE ---
+// --- 3. CIERRE DE UTILIDADES ---
 function exportarJSON() {
   if (!jsonMaestroData) { showToast("❌ No hay datos"); return; }
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonMaestroData, null, 2));
