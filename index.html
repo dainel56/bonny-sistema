@@ -1813,6 +1813,7 @@ function updateStatus() {
 }
 
 // --- 1. FUNCIÓN DE NAVEGACIÓN (Repara los botones de la izquierda) ---
+// --- 1. FUNCIÓN DE NAVEGACIÓN (Repara los botones de la izquierda) ---
 function nav(panelId) {
   // Ocultar todos los paneles
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -1858,7 +1859,7 @@ async function conectarConIA(prompt, targetId, btn, originalText) {
   targetEl.innerText = "🐰 Bonny está analizando...";
 
   // URL DE CONEXIÓN SEGURA
-  // Cambiamos a v1 (más estable) en lugar de v1 para evitar el error de modelo
+  // Cambiamos a v1 (más estable) en lugar de v1beta para evitar el error de modelo
   const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
   try {
