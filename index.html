@@ -1812,26 +1812,27 @@ function updateStatus() {
   }
 }
 
-// --- 1. NAVEGACIÓN UNIVERSAL (Repara botones de Sidebar) ---
+// --- 1. SISTEMA DE NAVEGACIÓN CORREGIDO ---
 function nav(panelId) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  const paneles = document.querySelectorAll('.panel');
+  const botones = document.querySelectorAll('.sb-btn');
+  paneles.forEach(p => p.classList.remove('active'));
+  botones.forEach(b => b.classList.remove('active'));
   
   const target = document.getElementById('p-' + panelId);
   if (target) {
     target.classList.add('active');
-    // Forzar activación del botón buscando por el ID del panel
-    const btn = document.querySelector(`[onclick="nav('${panelId}')"]`);
-    if(btn) btn.classList.add('active');
+    // Buscamos el botón por el atributo onclick
+    const btnActivo = document.querySelector(`[onclick*="nav('${panelId}')"]`);
+    if(btnActivo) btnActivo.classList.add('active');
   }
   window.scrollTo(0, 0);
 }
 
-// --- 2. MOTOR DE IA CON BYPASS (Repara el error Not Found) ---
+// --- 2. MOTOR IA CON PROTOCOLO DE AUTOREPARACIÓN ---
 async function runOrquestador() {
   const tema = document.getElementById('oq-tema').value;
   if (!tema) { showToast("⚠️ Escribe un tema"); return; }
-
   const btn = event.currentTarget;
   const originalText = btn.innerHTML;
   btn.innerHTML = '<span class="spinner"></span> Conectando...';
@@ -1839,9 +1840,23 @@ async function runOrquestador() {
 
   const prompt = `Actúa como Director de Producción de Bonny Finance. Genera un JSON maestro para un video sobre: "${tema}". Responde ÚNICAMENTE el objeto JSON puro.`;
 
-  // SOLUCIÓN TÉCNICA: Google exige v1beta para Flash 1.5 en la mayoría de las cuentas
+  // Intentamos la ruta que Google exige para Flash 1.5
+  const exito = await ejecutarLlamadaIA(prompt);
+
+  if (!exito) {
+    document.getElementById('oq-json-out').innerText = "❌ Error: Google rechazó la conexión. Verifica que tu API Key sea de Google AI Studio y tenga permisos para Gemini 1.5 Flash.";
+  }
+
+  btn.innerHTML = originalText;
+  btn.disabled = false;
+}
+
+async function ejecutarLlamadaIA(prompt) {
   const apiKey = localStorage.getItem('bonny_api_key');
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  const targetEl = document.getElementById('oq-json-out');
+  
+  // RUTA MAESTRA: Usamos v1beta + latest (La combinación que NO falla)
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
   try {
     const response = await fetch(endpoint, {
@@ -1851,47 +1866,47 @@ async function runOrquestador() {
     });
 
     const data = await response.json();
-    
+
     if (data.error) {
-      // Si v1beta falla por alguna razón, intentamos con Pro en v1 como último recurso
-      console.warn("Fallo Flash, intentando Pro...");
-      return intentarFallback(prompt, btn, originalText);
+      console.error("Error de Google:", data.error.message);
+      // Fallback a Gemini Pro si Flash no está disponible en tu región
+      if (data.error.message.includes("not found")) {
+        return await fallbackPro(prompt, apiKey);
+      }
+      return false;
     }
 
     const resText = data.candidates[0].content.parts[0].text;
     const cleanJson = resText.replace(/```json/g, "").replace(/```/g, "").trim();
-    
-    document.getElementById('oq-json-out').innerText = cleanJson;
+    targetEl.innerText = cleanJson;
     procesarRespuestaOrquestador(cleanJson);
-    showToast("✨ ¡Bonny ha respondido!");
+    showToast("✨ ¡Conexión exitosa!");
+    return true;
 
   } catch (err) {
-    document.getElementById('oq-json-out').innerText = "Error crítico: " + err.message;
-  } finally {
-    btn.innerHTML = originalText;
-    btn.disabled = false;
+    console.error("Error de red:", err);
+    return false;
   }
 }
 
-async function intentarFallback(prompt, btn, originalText) {
-  const apiKey = localStorage.getItem('bonny_api_key');
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
-  try {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    });
-    const data = await res.json();
+async function fallbackPro(prompt, key) {
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${key}`;
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+  });
+  const data = await response.json();
+  if (data.candidates) {
     const text = data.candidates[0].content.parts[0].text;
     document.getElementById('oq-json-out').innerText = text;
     procesarRespuestaOrquestador(text);
-  } catch (e) {
-    document.getElementById('oq-json-out').innerText = "❌ Error: Ningún modelo disponible.";
+    return true;
   }
+  return false;
 }
 
-// --- 3. UTILIDADES ---
+// --- 3. CIERRE DE UTILIDADES ---
 function exportarJSON() {
   if (!jsonMaestroData) { showToast("❌ No hay datos"); return; }
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonMaestroData, null, 2));
@@ -1902,8 +1917,8 @@ function exportarJSON() {
 }
 
 function copyOutput(id) {
-  const text = document.getElementById(id).innerText;
-  navigator.clipboard.writeText(text).then(() => showToast("¡Copiado!"));
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.innerText || el.textContent).then(() => showToast("¡Copiado!"));
 }
 
 function showToast(msj) {
