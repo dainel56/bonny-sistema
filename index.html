@@ -1812,15 +1812,128 @@ function updateStatus() {
   }
 }
 
-// Navegación de paneles
+// --- NAVEGACIÓN DE PANELES (SOLUCIONA QUE LOS BOTONES NO FUNCIONEN) ---
 function nav(panelId) {
+  // 1. Ocultar todos los paneles
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  // 2. Desactivar todos los botones de la barra lateral
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('p-' + panelId).classList.add('active');
-  event.currentTarget.classList.add('active');
+  
+  // 3. Mostrar el panel seleccionado
+  const target = document.getElementById('p-' + panelId);
+  if (target) {
+    target.classList.add('active');
+    // 4. Marcar botón actual como activo (usando el evento)
+    if (event && event.currentTarget) {
+      event.currentTarget.classList.add('active');
+    }
+  }
+  window.scrollTo(0, 0);
 }
 
-window.onload = updateStatus;
+// --- ORQUESTADOR IA (SOLUCIONA EL ERROR DE GEMINI) ---
+async function runOrquestador() {
+  const tema = document.getElementById('oq-tema').value;
+  if (!tema) { showToast("⚠️ Escribe un tema"); return; }
+
+  const btn = event.currentTarget;
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span class="spinner"></span> Procesando...';
+  btn.disabled = true;
+
+  const prompt = `Actúa como Director de Producción de Bonny Finance. 
+  Genera un JSON maestro para un video sobre: "${tema}". 
+  Responde ÚNICAMENTE con el objeto JSON puro sin texto adicional.`;
+
+  await conectarConGemini(prompt, 'oq-json-out', btn, originalText);
+}
+
+async function conectarConGemini(prompt, targetId, btn, originalText) {
+  const apiKey = localStorage.getItem('bonny_api_key');
+  if (!apiKey) { 
+    alert("Configura tu API Key en la barra lateral"); 
+    if(btn) { btn.innerHTML = originalText; btn.disabled = false; }
+    return; 
+  }
+
+  const targetEl = document.getElementById(targetId);
+  targetEl.innerText = "🐰 Bonny está pensando...";
+
+  // URL ACTUALIZADA: Usamos gemini-1.5-flash-8b para máxima compatibilidad
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${apiKey}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+    });
+
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+
+    const resText = data.candidates[0].content.parts[0].text;
+    const cleanJson = resText.replace(/```json/g, "").replace(/```/g, "").trim();
+    targetEl.innerText = cleanJson;
+
+    if (targetId === 'oq-json-out') {
+      procesarRespuestaOrquestador(cleanJson);
+    }
+
+  } catch (err) {
+    console.error(err);
+    targetEl.innerText = "Error Gemini: " + err.message;
+    showToast("❌ Falló la conexión");
+  } finally {
+    if(btn) { btn.innerHTML = originalText; btn.disabled = false; }
+  }
+}
+
+// --- UTILIDADES FINALES ---
+function exportarJSON() {
+  if (!jsonMaestroData) { showToast("❌ No hay datos para exportar"); return; }
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonMaestroData, null, 2));
+  const dl = document.createElement('a');
+  dl.setAttribute("href", dataStr);
+  dl.setAttribute("download", "bonny_proy_" + Date.now() + ".json");
+  dl.click();
+}
+
+function copyOutput(id) {
+  const el = document.getElementById(id);
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => showToast("¡Copiado!"));
+}
+
+function showToast(msj) {
+  const t = document.getElementById('toast');
+  t.innerText = msj; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function saveApiKey() {
+  const key = document.getElementById('gemApiKey').value;
+  localStorage.setItem('bonny_api_key', key);
+  updateStatus();
+}
+
+function updateStatus() {
+  const status = document.getElementById('apiKeyStatus');
+  const key = localStorage.getItem('bonny_api_key');
+  if(key && key.length > 10) {
+    status.innerText = "Configurada";
+    status.className = "badge badge-green";
+  } else {
+    status.innerText = "Sin configurar";
+    status.className = "badge badge-red";
+  }
+}
+
+window.onload = function() {
+  updateStatus();
+  const savedKey = localStorage.getItem('bonny_api_key');
+  if(savedKey) document.getElementById('gemApiKey').value = savedKey;
+};
 </script>
 
 <div id="toast"></div>
