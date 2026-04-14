@@ -1644,7 +1644,7 @@ RESPONDE ÚNICAMENTE con el JSON, sin texto adicional, sin markdown, sin explica
     setProgreso(30, 'Gemini Flash generando el JSON Maestro...');
     
     var resp = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey,
+      'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=' + apiKey,
       {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -1745,8 +1745,8 @@ async function conectarConGemini(prompt, targetId, btn, originalText) {
   const targetEl = document.getElementById(targetId);
   targetEl.innerText = "Bonny está pensando...";
 
-  // SOLUCIÓN AL ERROR: Usamos la URL v1beta con el nombre de modelo estable
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  // SOLUCIÓN AL ERROR: Usamos la URL v1 con el nombre de modelo estable
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
   try {
     const response = await fetch(url, {
@@ -1858,7 +1858,7 @@ async function conectarConIA(prompt, targetId, btn, originalText) {
   targetEl.innerText = "🐰 Bonny está analizando...";
 
   // URL DE CONEXIÓN SEGURA
-  // Cambiamos a v1 (más estable) en lugar de v1beta para evitar el error de modelo
+  // Cambiamos a v1 (más estable) en lugar de v1 para evitar el error de modelo
   const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
   try {
