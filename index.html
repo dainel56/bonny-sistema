@@ -1812,7 +1812,7 @@ function updateStatus() {
   }
 }
 
-// --- 1. NAVEGACIÓN (Repara la interfaz y los botones) ---
+// --- 1. MOTOR DE NAVEGACIÓN (Repara la Sidebar) ---
 function nav(panelId) {
   const paneles = document.querySelectorAll('.panel');
   const botones = document.querySelectorAll('.sb-btn');
@@ -1823,14 +1823,13 @@ function nav(panelId) {
   const target = document.getElementById('p-' + panelId);
   if (target) {
     target.classList.add('active');
-    // Iluminar el botón correcto
     const btnActivo = document.querySelector(`[onclick*="nav('${panelId}')"]`);
     if(btnActivo) btnActivo.classList.add('active');
   }
   window.scrollTo(0, 0);
 }
 
-// --- 2. MOTOR DE IA (Resuelve el error "Model not found") ---
+// --- 2. CONEXIÓN INTELIGENTE (Solución Error v1/Flash) ---
 async function runOrquestador() {
   const tema = document.getElementById('oq-tema').value;
   if (!tema) { showToast("⚠️ Escribe un tema"); return; }
@@ -1840,22 +1839,12 @@ async function runOrquestador() {
   btn.innerHTML = '<span class="spinner"></span> Conectando...';
   btn.disabled = true;
 
-  const prompt = `Actúa como Director de Producción. Genera un JSON maestro para un video sobre: "${tema}". Responde ÚNICAMENTE el objeto JSON puro.`;
+  const prompt = `Actúa como Director de Producción. Genera un JSON maestro para un video sobre: "${tema}". Responde ÚNICAMENTE el objeto JSON puro sin comentarios.`;
 
-  await conectarConIA(prompt, btn, originalText);
-}
-
-async function conectarConIA(prompt, btn, originalText) {
   const apiKey = localStorage.getItem('bonny_api_key');
   const targetEl = document.getElementById('oq-json-out');
-  
-  if (!apiKey) {
-    alert("Configura tu API Key en la barra lateral.");
-    if(btn) { btn.innerHTML = originalText; btn.disabled = false; }
-    return;
-  }
 
-  // URL DE ALTA COMPATIBILIDAD (Forzamos v1beta para Flash 1.5)
+  // URL FORZADA A V1BETA: Única forma de evitar el error "Model not found" para Flash 1.5
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
   try {
@@ -1876,18 +1865,19 @@ async function conectarConIA(prompt, btn, originalText) {
     
     targetEl.innerText = cleanJson;
     procesarRespuestaOrquestador(cleanJson);
-    showToast("✨ ¡Conexión exitosa!");
+    showToast("✨ Conexión establecida");
 
   } catch (err) {
     console.error(err);
     targetEl.innerText = "❌ Error de Google: " + err.message;
     showToast("Error en la conexión");
   } finally {
-    if(btn) { btn.innerHTML = originalText; btn.disabled = false; }
+    btn.innerHTML = originalText;
+    btn.disabled = false;
   }
 }
 
-// --- 3. UTILIDADES DE CIERRE ---
+// --- 3. UTILIDADES Y CIERRE ESTRUCTURAL ---
 function exportarJSON() {
   if (!jsonMaestroData) { showToast("❌ No hay datos"); return; }
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonMaestroData, null, 2));
@@ -1904,10 +1894,9 @@ function copyOutput(id) {
 
 function showToast(msj) {
   const t = document.getElementById('toast');
-  if(t) {
-    t.innerText = msj; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2500);
-  }
+  if(!t) return;
+  t.innerText = msj; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
 }
 
 function saveApiKey() {
