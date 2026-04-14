@@ -1111,468 +1111,28 @@ ATMOSPHERE: [INSERTAR AQUÍ: descripción de la escena, emoción, acción, entor
 
 <!-- ── SCRIPTS ────────────────────────────────────────────────────── -->
 <script>
-// ── NAVIGATION ────────────────────────────────────────────────────
-function nav(id){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
-  var panel=document.getElementById('p-'+id);
-  if(panel) panel.classList.add('active');
-  var btn=document.querySelector('.sb-btn[onclick="nav(\''+id+'\')"]');
-  if(btn) btn.classList.add('active');
-  document.querySelector('.main').scrollTop=0;
-  window.scrollTo(0,0);
+// --- 1. NAVEGACIÓN ---
+function nav(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  const t = document.getElementById('p-' + id);
+  if (t) { t.classList.add('active'); }
+  if (event && event.currentTarget) event.currentTarget.classList.add('active');
 }
 
-// ── CHIPS ─────────────────────────────────────────────────────────
-document.querySelectorAll('.chips').forEach(function(c){
-  c.querySelectorAll('.chip').forEach(function(ch){
-    ch.addEventListener('click',function(){
-      this.classList.toggle('on');
-    });
-  });
-});
-
-function getChips(containerId){
-  var vals=[];
-  document.querySelectorAll('#'+containerId+' .chip.on').forEach(function(c){ vals.push(c.dataset.val||c.textContent.trim()); });
-  return vals;
-}
-
-// ── OUTPUT / COPY ─────────────────────────────────────────────────
-function setOutput(id, text, cardId){
-  var el=document.getElementById(id);
-  if(el) el.textContent=text;
-  if(cardId){
-    var card=document.getElementById(cardId);
-    if(card) card.style.display='block';
-  }
-}
-
-function copyOutput(id){
-  var el=document.getElementById(id);
-  if(!el) return;
-  var txt=el.textContent||el.innerText;
-  navigator.clipboard.writeText(txt).then(function(){
-    showToast();
-  }).catch(function(){
-    var ta=document.createElement('textarea');
-    ta.value=txt; document.body.appendChild(ta);
-    ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta);
-    showToast();
-  });
-}
-
-function showToast(){
-  var t=document.getElementById('toast');
-  t.classList.add('show');
-  setTimeout(function(){t.classList.remove('show');},2000);
-}
-
-function clearAll(){
-  ['tema','tipo','afiliado','contexto'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el) el.value=el.tagName==='SELECT'?el.options[0].value:'';
-  });
-  setOutput('out-actualizar','');
-  var card=document.getElementById('out-actualizar-card');
-  if(card) card.style.display='none';
-}
-
-// ── GENERADORES DE PROMPT ─────────────────────────────────────────
-
-// ACTUALIZAR
-function genActualizar(){
-  var tema=document.getElementById('tema').value.trim();
-  var tipo=document.getElementById('tipo').value;
-  var afiliado=document.getElementById('afiliado').value;
-  var ctx=document.getElementById('contexto').value.trim();
-  if(!tema){ alert('Ingresa el tema del video'); return; }
-
-  var prompt=
-`ACTUALIZAR ${tema} Tipo-${tipo}${afiliado?' '+afiliado:''}
-
----
-
-Usa el sistema Bonny Finance v4.0 completo. Genera:
-
-1. CLASIFICACIÓN DEL VIDEO
-   - Tipo ${tipo === 'A' ? 'A (Educativo con afiliado integrado narrativamente)' : tipo === 'B' ? 'B (Review directa de producto)' : 'C (Educativo puro sin afiliado)'}
-   ${afiliado ? '- Afiliado: '+afiliado : '- Sin afiliado en este video'}
-
-2. METADATA SEO
-   - Título (máx 60 caracteres, con keyword principal)
-   - Descripción (primeras 2 líneas con keyword + CTA si aplica)
-   - 10 tags relevantes
-
-3. GUIÓN COMPLETO — 8 a 12 minutos | 1,200 a 1,800 palabras
-
-   REGLAS DE HUMANIZACIÓN (CRÍTICAS):
-   - Mencionar "Bonny" MÁXIMO 3 veces en todo el guion. El resto usar "yo", "me", "mi"
-   - El narrador habla en PRIMERA PERSONA como si le pasó a él mismo
-   - Usar frases cotidianas LATAM: "mano", "a fin de mes", "la quincena", "el chiste es que"
-   - El espectador debe pensar "eso me pasó a mí" — situaciones ultra específicas
-   - NUNCA sonar a explicación académica — hablar como en una conversación entre amigos
-   - Incluir momentos de vulnerabilidad: errores reales, vergüenzas, fracasos financieros
-
-   [HOOK - 0 a 30 seg] Situación específica y dolorosa en primera persona. Pregunta que clava.
-   [PROBLEMA - 30 seg a 2 min] Por qué la mayoría falla. Dato real + anécdota personal específica.
-   [PROMESA - 2 a 3 min] Qué aprenderán hoy. Por qué esto es diferente a lo que ya escucharon.
-   [DESARROLLO - 3 a 6 min] Enseñanza principal en pasos concretos. Ejemplos con números reales.
-   ${afiliado ? '[CTA AFILIADO - 6 a 7 min] Integrar '+afiliado+' como parte de la historia personal, NO como publicidad explícita.' : ''}
-   [REFUERZO - 7 a 9 min] Consecuencias reales de aplicar vs no aplicar. Números específicos.
-   [CIERRE - 9 a 12 min] Resumen 3 puntos. CTA orgánico. Teaser del próximo video.
-
-4. LISTA DE 54 ESCENAS — FORMATO v3.1
-   Reglas obligatorias:
-   - Prompt SIEMPRE en inglés
-   - Texto visible en la imagen SIEMPRE en español
-   - Asignar tipo: TIPO-A (40%), TIPO-B (35%), TIPO-C (25%)
-   
-   Formato: ESCENA [N] | TIPO-[A/B/C] | [Prompt en inglés. Texto en imagen entre comillas en español.]
-   
-   TIPO-A: Solo Bonny en situación narrativa. Sin texto ni gráficos.
-   TIPO-B: Gráfico/infográfico + texto en español + Bonny señalando.
-   TIPO-C: Texto tipográfico grande en español como elemento principal.
-   
-   Prefijo obligatorio en TODAS las escenas — personaje Bonny:
-   Young adult Latin American man late 20s, short black slightly messy hair, 
-   warm brown skin #C68642, plain navy shirt and casual pants, mature adult face,
-   NOT a child, NOT chibi. Palette: teal #00d4aa and navy #1A1A2E.
-
-5. PROMPT DE THUMBNAIL
-   - Bonny con expresión según el tema
-   - Texto principal en español (máx 4 palabras, fuente grande)
-   - Fondo color sólido o gradiente
-${ctx ? '\nCONTEXTO ADICIONAL: '+ctx : ''}`;
-
-  setOutput('out-actualizar', prompt, 'out-actualizar-card');
-}
-
-// TÍTULOS CTR
-function genTitulos(){
-  var tema=document.getElementById('tit-tema').value.trim();
-  var tipo=document.getElementById('tit-tipo').value;
-  var emocion=document.getElementById('tit-emocion').value;
-  var meta=document.getElementById('tit-meta').value;
-  if(!tema){ alert('Ingresa el tema del video'); return; }
-
-  var prompt=
-`TITULOS '${tema}' Tipo-${tipo} meta-${meta}-vistas
-
-ROL: Eres un ingeniero de títulos de YouTube especializado en finanzas personales LATAM.
-Canal: Bonny Finance | Audiencia: 25-45 años, clase trabajadora LATAM | CTR objetivo: >5%
-
-Tema: ${tema}
-Emoción dominante: ${emocion}
-Tipo de video: ${tipo === 'A' ? 'A — Educativo con afiliado' : tipo === 'B' ? 'B — Review directa' : 'C — Educativo puro'}
-
-Genera exactamente esto:
-
-1. ANÁLISIS DEL TEMA (2 líneas)
-   - Emoción primaria que activa el clic
-   - Keyword principal y volumen estimado LATAM
-
-2. TÍTULO FORMATO PROBLEMA/SOLUCIÓN (variante 1)
-   Formato: [Situación dolorosa] + [Promesa de salida]
-   Máx 60 caracteres.
-
-3. TÍTULO FORMATO DATO IMPACTANTE (variante 2)
-   Formato: [Número o % sorprendente] + [Consecuencia o revelación]
-   Máx 60 caracteres.
-
-4. TÍTULO FORMATO BONNY PERSONAL (variante 3)
-   Formato: Bonny en primera persona o referencia directa
-   Máx 60 caracteres.
-
-5. TÍTULO RECOMENDADO + RAZÓN
-   Cuál de los 3 tiene mayor probabilidad de superar CTR objetivo y por qué.
-
-6. TEXTO DEL THUMBNAIL alineado con el título recomendado (máx 4 palabras en MAYÚSCULAS)`;
-
-  setOutput('out-titulos', prompt, 'out-titulos-card');
-}
-
-// MINIATURAS
-function genMiniaturas(){
-  var tema=document.getElementById('min-tema').value.trim();
-  var keyword=document.getElementById('min-keyword').value.trim()||'DINERO';
-  var chips=getChips('min-chips');
-  var emocion=chips.length>0?chips[0]:'shock y preocupación';
-  if(!tema){ alert('Ingresa el tema del video'); return; }
-
-  var bonnyBase='Young adult Latin American man 28-35yo, short black messy hair, warm brown skin #C68642, navy shirt and casual pants, mature adult face NOT a child NOT chibi, 2D flat design adult illustration, palette teal #00d4aa and navy #1A1A2E';
-
-  var out=
-`=== MINIATURA VARIANTE 1 — EMOCIÓN: ${emocion.toUpperCase()} ===
-${bonnyBase}, ${emocion} expression, close-up face showing strong emotion about personal finance, bold Spanish text overlay "${keyword.toUpperCase()}" in large white bold typography top center, dramatic lighting, YouTube thumbnail composition 16:9.
-
-=== MINIATURA VARIANTE 2 — CON ELEMENTO VISUAL ===
-${bonnyBase}, pointing at a floating visual element related to "${tema}", surprised expression, bold Spanish text "${keyword.toUpperCase()}" in large teal bold font, dark navy background with golden accent glow, YouTube thumbnail quality 16:9.
-
-=== MINIATURA VARIANTE 3 — SPLIT SCREEN ===
-Split screen flat design: left side dark red tones showing the problem related to "${tema}", right side teal tones showing Bonny with confident expression holding coins or chart, bold Spanish text "${keyword.toUpperCase()}" centered in white, dark navy dividing line, 16:9 YouTube thumbnail.
-
----
-RECOMENDACIÓN: La variante que mejor corresponde a "${emocion}" y mayor CTR potencial es la Variante 1 por el close-up emocional. Usa las 3 en el generador Gemini y elige la más impactante visualmente.`;
-
-  setOutput('out-min', out, 'out-min-card');
-}
-
-// 54 ESCENAS
-function genEscenas(){
-  var tema=document.getElementById('esc-tema').value.trim();
-  var dur=document.getElementById('esc-dur').value;
-  var momentos=document.getElementById('esc-momentos').value.trim();
-  var n=Math.round(parseFloat(dur)*6);
-  if(!tema){ alert('Ingresa el tema del video'); return; }
-
-  var prompt=
-`Genera la lista completa de ${n} escenas para el video de Bonny Finance sobre:
-"${tema}"
-Duración: ${dur} minutos | ${n} escenas (1 por cada 10 segundos)
-${momentos?'Momentos clave: '+momentos:''}
-
-REGLAS OBLIGATORIAS:
-- Prompts SIEMPRE en inglés (mayor calidad en Gemini)
-- Texto visible en imagen SIEMPRE en español
-- Distribuir: TIPO-A 40% (${Math.round(n*0.4)} esc) / TIPO-B 35% (${Math.round(n*0.35)} esc) / TIPO-C 25% (${Math.round(n*0.25)} esc)
-
-TIPOS:
-TIPO-A: Solo Bonny en situación narrativa. Sin texto ni gráficos en imagen.
-TIPO-B: Gráfico/infografía + texto en español entre comillas + Bonny señalando.
-TIPO-C: Texto tipográfico grande en español como elemento visual principal.
-
-PREFIJO BONNY (incluir en TODAS las escenas TIPO-A):
-Young adult Latin American man late 20s, short black slightly messy hair,
-warm brown skin #C68642, plain navy shirt and casual pants, mature adult face,
-NOT a child NOT chibi. Style: 2D flat design adult illustration.
-Palette: teal #00d4aa and navy #1A1A2E.
-
-FORMATO DE CADA ESCENA:
-ESCENA [N] | TIPO-[A/B/C] | [Prompt en inglés. Texto en imagen entre "comillas" en español si aplica.]
-
-ESTRUCTURA DE DISTRIBUCIÓN:
-- Escenas 01-03: Hook — TIPO-A o TIPO-C (tensión máxima)
-- Escenas 04-10: Problema — TIPO-A + 1-2 TIPO-B con datos
-- Escenas 11-20: Datos — principalmente TIPO-B
-- Escenas 21-32: Análisis — mix TIPO-A y TIPO-B
-- Escenas 33-36: Giro — TIPO-C impactante
-- Escenas 37-48: Solución — TIPO-B pasos + TIPO-A Bonny aplicando
-- Escenas 49-54: Resumen y CTA — TIPO-C + TIPO-A
-
-Genera las ${n} escenas numeradas con este formato exacto.`;
-
-  setOutput('out-esc', prompt, 'out-esc-card');
-}
-
-// TENDENCIAS
-function genTendencias(){
-  var pais=document.getElementById('tend-pais').value;
-  var mes=document.getElementById('tend-mes').value.trim()||'Abril 2026';
-  var chips=getChips('tend-chips');
-  var subnichos=chips.join(', ')||'ahorro, deudas, inversiones';
-
-  var prompt=
-`TENDENCIAS ${mes} ${pais}
-
-ROL: Eres un analista de contenido especializado en finanzas personales LATAM para YouTube.
-Canal: Bonny Finance | Audiencia: trabajadores 25-45 años clase media-baja LATAM
-
-${pais === 'USA — Latinos' ? 'CONTEXTO USA: Esta audiencia es latina viviendo en Estados Unidos. Los temas pueden venir del mundo anglosajón (401k, credit score, W2, tax return, minimum wage) pero SIEMPRE explicados en español y conectados con la realidad latina. Un tema viral en inglés adaptado al español para latinos en USA puede generar 3x más views.' : ''}
-
-Analiza el panorama de ${mes} para ${pais} y entrega:
-
-1. TOP 5 TEMAS EN TENDENCIA
-   - Tema + por qué está en tendencia ahora (evento económico, estación, etc.)
-   - Volumen de búsqueda estimado
-   - Nivel de competencia (bajo/medio/alto)
-   - Ángulo narrativo específico para Bonny
-
-2. SUB-NICHOS A EXPLORAR: ${subnichos}
-   Para cada uno: oportunidad actual + tema concreto + hook de apertura
-
-3. TEMAS EVERGREEN para el mes
-   - 2 temas con búsqueda constante que nunca caducan
-
-4. RECOMENDACIÓN DE CALENDARIO
-   - Qué video publicar primero y por qué
-   - Qué tema guardar para el siguiente mes
-
-5. AFILIADO RECOMENDADO
-   - Qué afiliado tiene mejor conversión potencial este mes y por qué`;
-
-  setOutput('out-tend', prompt, 'out-tend-card');
-}
-
-// CURAR
-function genCurar(){
-  var t1=document.getElementById('cur-t1').value.trim();
-  var t2=document.getElementById('cur-t2').value.trim();
-  var t3=document.getElementById('cur-t3').value.trim();
-  if(!t1){ alert('Pega al menos la primera transcripción'); return; }
-
-  var prompt=
-`CURAR
-
-ROL: Eres un analista forense de guiones e ingeniero inverso especializado en YouTube finanzas LATAM.
-Extrae TODOS los patrones replicables para el canal Bonny Finance.
-
-TRANSCRIPCIÓN 1:
-${t1}
-
-TRANSCRIPCIÓN 2:
-${t2||'[No proporcionada]'}
-
-TRANSCRIPCIÓN 3:
-${t3||'[No proporcionada]'}
-
-Analiza y entrega:
-
-1. PATRÓN DE GANCHO (primeros 30 segundos)
-   - Estructura exacta de apertura en los videos
-   - Fórmula común entre ellos
-   - Template replicable para Bonny: [_____]
-
-2. PATRÓN DE PROMESA (minuto 1-3)
-   - Cómo plantean el beneficio sin revelar la solución
-   - Palabras y frases de mayor impacto
-   - Template para Bonny: [_____]
-
-3. PATRÓN DE DESARROLLO
-   - Estructura lógica A→B→C
-   - Uso de números, pasos, anécdotas vs datos
-   - Ritmo: duración por bloque
-
-4. PATRÓN DE CTA
-   - Cómo integran el llamado a la acción sin interrumpir
-   - Frases de transición exactas
-   - Adaptación para CTA de afiliado de Bonny
-
-5. PATRÓN LINGÜÍSTICO
-   - Nivel de vocabulario (escala 1-10 de simplicidad)
-   - Metáforas y analogías que funcionan
-   - Frases de conectividad más usadas
-
-6. TOP 5 PATRONES CRÍTICOS
-   Lista priorizada listos para usar como instrucciones adicionales en el próximo ACTUALIZAR`;
-
-  setOutput('out-curar', prompt, 'out-curar-card');
-}
-
-// ANALIZAR
-function genAnalizar(){
-  var mes=document.getElementById('ana-mes').value.trim()||'el mes pasado';
-  var num=document.getElementById('ana-num').value.trim()||'4';
-  var mejor=document.getElementById('ana-mejor').value.trim()||'no especificado';
-  var peor=document.getElementById('ana-peor').value.trim()||'no especificado';
-  var obs=document.getElementById('ana-obs').value.trim();
-
-  var prompt=
-`ANALIZAR ${mes} ${num}-videos '${mejor}' '${peor}'
-
-ROL: Eres el analista de canal de Bonny Finance. Diagnostica el período con precisión.
-
-Período: ${mes}
-Videos publicados: ${num}
-Video con más vistas: ${mejor}
-Video con menos vistas: ${peor}
-${obs?'Observaciones adicionales: '+obs:''}
-
-Entrega:
-
-1. DIAGNÓSTICO DE RENDIMIENTO
-   - Qué funcionó y por qué (basado en los datos del mejor video)
-   - Qué falló y por qué (basado en los datos del peor video)
-   - Patrón identificado entre los ${num} videos
-
-2. ANÁLISIS DE TÍTULOS
-   - Qué palabras/emociones activaron más clics
-   - Qué formatos de título evitar el próximo mes
-
-3. PATRÓN DE HOOKS
-   - Qué tipo de gancho retuvo más (dolor / curiosidad / sorpresa)
-   - Recomendación de estructura de gancho para el próximo mes
-
-4. OPORTUNIDADES IDENTIFICADAS
-   - 3 temas con alta búsqueda y baja competencia para el mes siguiente
-   - 1 tema evergreen que merece versión larga (15+ min)
-
-5. AJUSTE DE AFILIADOS
-   - Qué afiliado convirtió mejor este mes
-   - Recomendación de afiliado a priorizar el próximo mes
-
-6. PLAN DE ACCIÓN
-   - Los 3 cambios más importantes para el próximo mes`;
-
-  setOutput('out-ana', prompt, 'out-ana-card');
-}
-
-// ════════════════════════════════════════════════════════════
-// ORQUESTADOR IA v5.0
-// ════════════════════════════════════════════════════════════
-
-// API KEY MANAGEMENT
-function saveApiKey(){
-  var k = document.getElementById('gemApiKey').value.trim();
-  if(k) {
-    localStorage.setItem('bonny_gem_key', k);
-    document.getElementById('apiKeyStatus').textContent = '✓ Key guardada localmente';
-    document.getElementById('apiKeyStatus').style.color = 'var(--green)';
-  }
-}
-function loadApiKey(){
-  var k = localStorage.getItem('bonny_gem_key') || '';
-  if(k) {
-    document.getElementById('gemApiKey').value = k;
-    document.getElementById('apiKeyStatus').textContent = '✓ Key cargada';
-    document.getElementById('apiKeyStatus').style.color = 'var(--green)';
-  }
-}
-loadApiKey();
-
-// IMGS COUNTER
-function getImgsHoy(){
-  var hoy = new Date().toDateString();
-  var data = JSON.parse(localStorage.getItem('bonny_imgs_'+hoy)||'{"count":0}');
-  return data.count;
-}
-function addImgsHoy(n){
-  var hoy = new Date().toDateString();
-  var data = JSON.parse(localStorage.getItem('bonny_imgs_'+hoy)||'{"count":0}');
-  data.count += n;
-  localStorage.setItem('bonny_imgs_'+hoy, JSON.stringify(data));
-  document.getElementById('imgs-usadas').textContent = data.count + ' / 500';
-}
-document.getElementById('imgs-usadas').textContent = getImgsHoy() + ' / 500';
-
-// PROGRESO UI
-function setProgreso(pct, msg){
-  document.getElementById('oq-prf').style.width = pct + '%';
-  document.getElementById('oq-status').textContent = msg;
-}
-
-// --- MOTOR DE INTELIGENCIA BONNY (REPARADO) ---
-
+// --- 2. MOTOR IA ACTUALIZADO (Usando Gemini 2.5 Flash) ---
 async function runOrquestador() {
   const tema = document.getElementById('oq-tema').value;
-  if (!tema) { showToast("⚠️ Por favor, escribe un tema para el video."); return; }
-
+  if (!tema) return alert("Escribe un tema");
+  
   const btn = event.currentTarget;
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<span class="spinner"></span> Conectando con Gemini...';
-  btn.disabled = true;
+  const original = btn.innerHTML;
+  btn.innerHTML = "Conectando..."; btn.disabled = true;
 
   const apiKey = localStorage.getItem('bonny_api_key');
-  if (!apiKey) {
-    alert("Configura tu API Key en la barra lateral primero.");
-    btn.innerHTML = originalText;
-    btn.disabled = false;
-    return;
-  }
-
-  // SOLUCIÓN AL ERROR: Forzamos v1beta para Gemini 1.5 Flash
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  
+  // CAMBIO CLAVE: Usamos v1beta y el modelo que TÚ TIENES activo
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   const prompt = `Actúa como Director de Producción de Bonny Finance. Genera un JSON maestro para un video sobre: "${tema}". Responde ÚNICAMENTE el objeto JSON puro.`;
 
@@ -1584,58 +1144,36 @@ async function runOrquestador() {
     });
 
     const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
 
-    if (data.error) {
-      throw new Error(data.error.message);
-    }
-
-    const resText = data.candidates[0].content.parts[0].text;
-    const cleanJson = resText.replace(/```json/g, "").replace(/```/g, "").trim();
-    
-    document.getElementById('oq-json-out').innerText = cleanJson;
-    procesarRespuestaOrquestador(cleanJson);
-    showToast("✨ ¡Estructura generada con éxito!");
-
-  } catch (err) {
-    console.error(err);
-    document.getElementById('oq-json-out').innerText = "❌ Error Gemini: " + err.message;
-    showToast("Error en la conexión");
+    const txt = data.candidates[0].content.parts[0].text.replace(/```json|```/g, "").trim();
+    document.getElementById('oq-json-out').innerText = txt;
+    procesarRespuestaOrquestador(txt);
+    showToast("✨ ¡Conectado con Gemini 2.5!");
+  } catch (e) {
+    document.getElementById('oq-json-out').innerText = "Error: " + e.message;
   } finally {
-    btn.innerHTML = originalText;
-    btn.disabled = false;
+    btn.innerHTML = original; btn.disabled = false;
   }
 }
 
-// --- NAVEGACIÓN Y CIERRES ---
-function nav(panelId) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
-  const target = document.getElementById('p-' + panelId);
-  if (target) target.classList.add('active');
-  const btn = document.querySelector(`[onclick="nav('${panelId}')"]`);
-  if (btn) btn.classList.add('active');
-}
-
+// --- 3. CIERRES DE SISTEMA ---
 function saveApiKey() {
-  const key = document.getElementById('gemApiKey').value;
-  localStorage.setItem('bonny_api_key', key);
+  localStorage.setItem('bonny_api_key', document.getElementById('gemApiKey').value);
   updateStatus();
-  showToast("Clave guardada correctamente");
 }
-
 function updateStatus() {
-  const status = document.getElementById('apiKeyStatus');
-  const key = localStorage.getItem('bonny_api_key');
-  if(key && key.length > 10) {
-    status.innerText = "Configurada";
-    status.className = "badge badge-green";
-  }
+  const k = localStorage.getItem('bonny_api_key');
+  const s = document.getElementById('apiKeyStatus');
+  if(k) { s.innerText="Configurada"; s.className="badge badge-green"; }
 }
-
-window.onload = function() {
+function showToast(m) { 
+  const t = document.getElementById('toast'); 
+  if(t) { t.innerText = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2000); }
+}
+window.onload = () => {
   updateStatus();
-  const savedKey = localStorage.getItem('bonny_api_key');
-  if(savedKey) document.getElementById('gemApiKey').value = savedKey;
+  if(localStorage.getItem('bonny_api_key')) document.getElementById('gemApiKey').value = localStorage.getItem('bonny_api_key');
 };
 </script>
 <div id="toast"></div>
