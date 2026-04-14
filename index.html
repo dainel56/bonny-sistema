@@ -1812,18 +1812,18 @@ function updateStatus() {
   }
 }
 
-// --- NAVEGACIÓN DE PANELES (SOLUCIONA QUE LOS BOTONES NO FUNCIONEN) ---
+// --- 1. FUNCIÓN DE NAVEGACIÓN (Repara los botones de la izquierda) ---
 function nav(panelId) {
-  // 1. Ocultar todos los paneles
+  // Ocultar todos los paneles
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  // 2. Desactivar todos los botones de la barra lateral
+  // Desmarcar todos los botones
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
   
-  // 3. Mostrar el panel seleccionado
+  // Mostrar el panel que corresponde
   const target = document.getElementById('p-' + panelId);
   if (target) {
     target.classList.add('active');
-    // 4. Marcar botón actual como activo (usando el evento)
+    // Marcar el botón que se tocó
     if (event && event.currentTarget) {
       event.currentTarget.classList.add('active');
     }
@@ -1831,7 +1831,7 @@ function nav(panelId) {
   window.scrollTo(0, 0);
 }
 
-// --- ORQUESTADOR IA (SOLUCIONA EL ERROR DE GEMINI) ---
+// --- 2. EL MOTOR DE GEMINI (Repara el error "Model not found") ---
 async function runOrquestador() {
   const tema = document.getElementById('oq-tema').value;
   if (!tema) { showToast("⚠️ Escribe un tema"); return; }
@@ -1841,14 +1841,12 @@ async function runOrquestador() {
   btn.innerHTML = '<span class="spinner"></span> Procesando...';
   btn.disabled = true;
 
-  const prompt = `Actúa como Director de Producción de Bonny Finance. 
-  Genera un JSON maestro para un video sobre: "${tema}". 
-  Responde ÚNICAMENTE con el objeto JSON puro sin texto adicional.`;
+  const prompt = `Actúa como Director de Producción de Bonny Finance. Genera un JSON maestro para un video sobre: "${tema}". Responde ÚNICAMENTE el objeto JSON.`;
 
-  await conectarConGemini(prompt, 'oq-json-out', btn, originalText);
+  await conectarConIA(prompt, 'oq-json-out', btn, originalText);
 }
 
-async function conectarConGemini(prompt, targetId, btn, originalText) {
+async function conectarConIA(prompt, targetId, btn, originalText) {
   const apiKey = localStorage.getItem('bonny_api_key');
   if (!apiKey) { 
     alert("Configura tu API Key en la barra lateral"); 
@@ -1857,10 +1855,11 @@ async function conectarConGemini(prompt, targetId, btn, originalText) {
   }
 
   const targetEl = document.getElementById(targetId);
-  targetEl.innerText = "🐰 Bonny está pensando...";
+  targetEl.innerText = "🐰 Bonny está analizando...";
 
-  // URL ACTUALIZADA: Usamos gemini-1.5-flash-8b para máxima compatibilidad
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-8b:generateContent?key=${apiKey}`;
+  // URL DE CONEXIÓN SEGURA
+  // Cambiamos a v1 (más estable) en lugar de v1beta para evitar el error de modelo
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
   try {
     const response = await fetch(url, {
@@ -1870,10 +1869,13 @@ async function conectarConGemini(prompt, targetId, btn, originalText) {
     });
 
     const data = await response.json();
+    
     if (data.error) throw new Error(data.error.message);
 
     const resText = data.candidates[0].content.parts[0].text;
+    // Limpiar posibles marcas de código Markdown
     const cleanJson = resText.replace(/```json/g, "").replace(/```/g, "").trim();
+    
     targetEl.innerText = cleanJson;
 
     if (targetId === 'oq-json-out') {
@@ -1883,15 +1885,18 @@ async function conectarConGemini(prompt, targetId, btn, originalText) {
   } catch (err) {
     console.error(err);
     targetEl.innerText = "Error Gemini: " + err.message;
-    showToast("❌ Falló la conexión");
+    showToast("❌ Error de conexión");
   } finally {
-    if(btn) { btn.innerHTML = originalText; btn.disabled = false; }
+    if(btn) {
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    }
   }
 }
 
-// --- UTILIDADES FINALES ---
+// --- 3. UTILIDADES ---
 function exportarJSON() {
-  if (!jsonMaestroData) { showToast("❌ No hay datos para exportar"); return; }
+  if (!jsonMaestroData) { showToast("❌ No hay datos"); return; }
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonMaestroData, null, 2));
   const dl = document.createElement('a');
   dl.setAttribute("href", dataStr);
