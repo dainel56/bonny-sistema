@@ -6,7 +6,7 @@
 <title>Bonny Finance — Sistema de Producción v5.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* ── ROOT ────────────────────────────────────────────────────────── */
+/* ── ROOT & BASE (Mantenido igual) ────────────────────────── */
 :root{
   --teal:    #00d4aa;
   --teal2:   #00a886;
@@ -33,9 +33,7 @@ body{
 }
 body::before{
   content:'';position:fixed;inset:0;
-  background:
-    radial-gradient(ellipse 60% 40% at 80% 10%, rgba(0,212,170,.06) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 30% at 10% 80%, rgba(244,163,0,.04) 0%, transparent 50%);
+  background: radial-gradient(ellipse 60% 40% at 80% 10%, rgba(0,212,170,.06) 0%, transparent 60%);
   pointer-events:none;z-index:0;
 }
 
@@ -60,9 +58,7 @@ body::before{
 }
 .sb-logo-name{font-size:16px;font-weight:700;color:var(--teal);letter-spacing:-.3px}
 .sb-logo-ver{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-top:2px}
-
 .sb-section{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:10px 18px 6px;font-family:'DM Mono',monospace}
-
 .sb-btn{
   display:flex;align-items:center;gap:10px;
   padding:9px 18px;
@@ -76,82 +72,25 @@ body::before{
 .sb-btn:hover{color:var(--text);background:rgba(0,212,170,.06);border-left-color:rgba(0,212,170,.3)}
 .sb-btn.active{color:var(--teal);background:rgba(0,212,170,.1);border-left-color:var(--teal);font-weight:600}
 .sb-icon{width:16px;text-align:center;flex-shrink:0;font-size:14px}
-
 .sb-divider{height:1px;background:var(--border);margin:10px 18px}
 
 /* ── PANELS ──────────────────────────────────────────────────────── */
 .panel{display:none}
 .panel.active{display:block}
 
-/* ── HEADER ──────────────────────────────────────────────────────── */
-.page-head{margin-bottom:24px}
-.page-title{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:4px}
-.page-sub{font-size:13px;color:var(--muted)}
-.teal{color:var(--teal)}
-
-/* ── CARDS ───────────────────────────────────────────────────────── */
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:20px 22px;
-  margin-bottom:16px;
-  backdrop-filter:blur(8px);
-}
-.card-title{
-  font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--teal);margin-bottom:14px;
-  display:flex;align-items:center;gap:8px;
-}
+/* ── CARDS & FORM (Resumido para espacio) ────────────────────────── */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px;backdrop-filter:blur(8px);}
+.card-title{font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
 .card-title::after{content:'';flex:1;height:1px;background:var(--border)}
-
-/* ── FORM ELEMENTS ───────────────────────────────────────────────── */
 label{font-size:11px;color:var(--muted);display:block;margin-bottom:5px;letter-spacing:.5px;text-transform:uppercase}
-input[type=text],input[type=password],textarea,select{
-  width:100%;
-  background:rgba(0,0,0,.3);
-  border:1px solid var(--border);
-  border-radius:6px;
-  color:var(--text);
-  font-family:'Space Grotesk',sans-serif;
-  font-size:13px;
-  padding:9px 12px;
-  outline:none;
-}
-input:focus,textarea:focus,select:focus{border-color:var(--teal)}
-
-/* ── BUTTONS ─────────────────────────────────────────────────────── */
-.btn{
-  font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;
-  padding:9px 18px;border-radius:7px;border:none;cursor:pointer;
-  display:inline-flex;align-items:center;gap:7px;
-  transition:all .15s;white-space:nowrap;
-}
+input, textarea, select{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:9px 12px;outline:none;font-family:inherit;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.btn{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;padding:9px 18px;border-radius:7px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .15s;}
 .btn-primary{background:var(--teal);color:var(--navy);font-weight:700}
-.btn-primary:hover{background:var(--teal2);transform:translateY(-1px)}
-.btn-outline{background:transparent;color:var(--teal);border:1px solid var(--border)}
 .btn-copy{background:rgba(0,212,170,.12);color:var(--teal);border:1px solid var(--border)}
-
-/* ── OUTPUT BOX ──────────────────────────────────────────────────── */
-.output-box{
-  background:rgba(0,0,0,.35);
-  border:1px solid var(--border);
-  border-radius:8px;
-  padding:16px;
-  font-family:'DM Mono',monospace;
-  font-size:12px;
-  color:#a8d5cb;
-  line-height:1.7;
-  white-space:pre-wrap;
-  word-break:break-word;
-  max-height:420px;
-  overflow-y:auto;
-}
-
-.badge-red{background:rgba(231,76,60,.15);color:var(--red);border:1px solid rgba(231,76,60,.3); padding: 2px 5px; border-radius: 4px; font-size: 10px;}
-.badge-green{background:rgba(46,204,113,.15);color:var(--green);border:1px solid rgba(46,204,113,.3); padding: 2px 5px; border-radius: 4px; font-size: 10px;}
-
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.output-box{background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:'DM Mono',monospace;font-size:12px;color:#a8d5cb;white-space:pre-wrap;max-height:400px;overflow-y:auto;}
+.badge-red{color:var(--red);font-size:10px;}
+.badge-green{color:var(--green);font-size:10px;}
 </style>
 </head>
 <body>
@@ -164,48 +103,76 @@ input:focus,textarea:focus,select:focus{border-color:var(--teal)}
     </div>
     <div style="padding:10px 14px;border-bottom:1px solid var(--border)">
       <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;font-family:'DM Mono',monospace">🔑 Gemini API Key</div>
-      <input type="password" id="gemApiKey" placeholder="AIzaSy..."
-        style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'DM Mono',monospace;font-size:10px;padding:6px 8px;outline:none;box-sizing:border-box"
-        oninput="saveApiKey()">
+      <input type="password" id="gemApiKey" placeholder="AIzaSy..." oninput="saveApiKey()">
       <div style="font-size:9px;margin-top:4px;font-family:'DM Mono',monospace" id="apiKeyStatus" class="badge-red">Sin configurar</div>
     </div>
 
     <div class="sb-section">🤖 IA Automatizada</div>
-    <button class="sb-btn active" onclick="nav('orquestador')"><span class="sb-icon">🚀</span>Orquestador IA</button>
+    <button class="sb-btn" onclick="nav('orquestador')"><span class="sb-icon">🚀</span>Orquestador IA</button>
+
     <div class="sb-divider"></div>
     <div class="sb-section">Producción Manual</div>
-    <button class="sb-btn" onclick="nav('produccion')"><span class="sb-icon">⚡</span>Nuevo video</button>
+    <button class="sb-btn active" onclick="nav('produccion')"><span class="sb-icon">⚡</span>Nuevo video</button>
+    <button class="sb-btn" onclick="nav('titulos')"><span class="sb-icon">📋</span>Títulos CTR</button>
+    <button class="sb-btn" onclick="nav('miniaturas')"><span class="sb-icon">🖼</span>Miniaturas</button>
+    <button class="sb-btn" onclick="nav('escenas')"><span class="sb-icon">🎬</span>54 Escenas</button>
   </aside>
 
   <main class="main">
-    <div class="panel active" id="p-orquestador">
+    <div class="panel active" id="p-produccion">
       <div class="page-head">
-        <div class="page-title">🚀 Orquestador <span class="teal">IA Maestro</span></div>
-        <div class="page-sub">Genera el JSON completo (Guion + Prompts) para enviar a Python.</div>
+        <div class="page-title">⚡ Nuevo <span class="teal">Video</span></div>
       </div>
-
       <div class="card">
-        <div class="card-title">Configuración del Proyecto</div>
-        <div class="form-group" style="margin-bottom: 15px;">
-          <label>Tema del Video</label>
-          <input type="text" id="tema-orq" placeholder="Ej: La verdad sobre los fondos de inversión">
+        <div class="card-title">01 — Tema del video</div>
+        <input type="text" id="tema" placeholder="ej: Por qué tu tarjeta de débito te hace perder dinero">
+        <div style="margin-top:15px">
+            <button class="btn btn-primary" onclick="ejecutarAccion('produccion')">⚡ Generar Inteligencia</button>
         </div>
-        <button class="btn btn-primary" onclick="ejecutarOrquestador()">⚡ Generar JSON Maestro</button>
       </div>
+      <div class="card" id="out-produccion-card" style="display:none">
+        <div class="output-box" id="out-produccion"></div>
+      </div>
+    </div>
 
-      <div class="card" id="out-orq-card" style="display:none">
-        <div class="card-title">JSON Maestro Generado</div>
+    <div class="panel" id="p-orquestador">
+      <div class="page-head"><div class="page-title">🚀 Orquestador <span class="teal">JSON Maestro</span></div></div>
+      <div class="card">
+        <label>Tema para Python</label>
+        <input type="text" id="tema-orq" placeholder="Introduce el tema central">
+        <button class="btn btn-primary" style="margin-top:15px" onclick="ejecutarAccion('orquestador')">📦 Generar Pack Maestro</button>
+      </div>
+      <div class="card" id="out-orquestador-card" style="display:none">
         <div class="output-box" id="out-orquestador"></div>
-        <div style="margin-top: 10px;">
-            <button class="btn btn-copy" onclick="copyOutput('out-orquestador')">📋 Copiar para Python</button>
-        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="p-titulos">
+      <div class="page-head"><div class="page-title">📋 Títulos <span class="teal">CTR</span></div></div>
+      <div class="card">
+        <input type="text" id="tit-tema" placeholder="Tema para títulos">
+        <button class="btn btn-primary" style="margin-top:15px" onclick="ejecutarAccion('titulos')">📋 Generar Títulos</button>
+      </div>
+      <div class="card" id="out-titulos-card" style="display:none">
+        <div class="output-box" id="out-titulos"></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p-escenas">
+      <div class="page-head"><div class="page-title">🎬 54 <span class="teal">Escenas</span></div></div>
+      <div class="card">
+        <input type="text" id="esc-tema" placeholder="Tema para las 54 escenas">
+        <button class="btn btn-primary" style="margin-top:15px" onclick="ejecutarAccion('escenas')">🎬 Generar Prompts</button>
+      </div>
+      <div class="card" id="out-escenas-card" style="display:none">
+        <div class="output-box" id="out-escenas"></div>
       </div>
     </div>
   </main>
 </div>
 
 <script>
-// --- LOGICA DE NAVEGACION ---
+// --- NAVEGACIÓN ---
 function nav(id) {
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.getElementById('p-' + id).classList.add('active');
@@ -213,57 +180,51 @@ function nav(id) {
     event.currentTarget.classList.add('active');
 }
 
-// --- API KEY MANAGEMENT ---
+// --- API KEY ---
 function saveApiKey() {
     const key = document.getElementById('gemApiKey').value;
     localStorage.setItem('bonny_api_key', key);
     updateKeyStatus(key);
 }
-
 function updateKeyStatus(key) {
     const status = document.getElementById('apiKeyStatus');
-    if(key.length > 10) {
-        status.textContent = "Configurada";
-        status.className = "badge-green";
-    } else {
-        status.textContent = "Sin configurar";
-        status.className = "badge-red";
-    }
+    if(key.length > 10) { status.textContent = "Configurada"; status.className = "badge-green"; }
+    else { status.textContent = "Sin configurar"; status.className = "badge-red"; }
 }
-
-// Cargar key al iniciar
 window.onload = () => {
     const savedKey = localStorage.getItem('bonny_api_key');
-    if(savedKey) {
-        document.getElementById('gemApiKey').value = savedKey;
-        updateKeyStatus(savedKey);
-    }
+    if(savedKey) { document.getElementById('gemApiKey').value = savedKey; updateKeyStatus(savedKey); }
 }
 
-// --- ORQUESTADOR PRINCIPAL ---
-async function ejecutarOrquestador() {
-    const tema = document.getElementById('tema-orq').value;
+// --- FUNCIÓN MAESTRA CORREGIDA (API v1) ---
+async function ejecutarAccion(tipo) {
     const apiKey = document.getElementById('gemApiKey').value;
+    if(!apiKey) return alert("Ingresa tu API Key");
 
-    if(!tema || !apiKey) {
-        alert("Falta el tema o la API Key");
-        return;
+    let tema = "";
+    let promptFinal = "";
+    
+    // Identificar qué panel está pidiendo la info
+    if(tipo === 'produccion') {
+        tema = document.getElementById('tema').value;
+        promptFinal = `Genera un guion educativo de finanzas sobre: ${tema}.`;
+    } else if(tipo === 'orquestador') {
+        tema = document.getElementById('tema-orq').value;
+        promptFinal = `Genera un JSON maestro para el video "${tema}" con 10 escenas. Formato: { "proyecto": "${tema}", "escenas": [...] }. Responde solo JSON.`;
+    } else if(tipo === 'titulos') {
+        tema = document.getElementById('tit-tema').value;
+        promptFinal = `Genera 3 títulos virales con alto CTR para un video sobre: ${tema}.`;
+    } else if(tipo === 'escenas') {
+        tema = document.getElementById('esc-tema').value;
+        promptFinal = `Genera 54 prompts de imagen para un video de finanzas sobre: ${tema}. Estilo 2D corporate.`;
     }
 
-    const outputBox = document.getElementById('out-orquestador');
-    const outputCard = document.getElementById('out-orq-card');
-    outputBox.textContent = "Generando inteligencia financiera... espera 10-20 segundos.";
+    const outputBox = document.getElementById('out-' + tipo);
+    const outputCard = document.getElementById('out-' + tipo + '-card');
+    outputBox.textContent = "Procesando con Gemini 1.5 Flash...";
     outputCard.style.display = 'block';
 
-    const promptMaster = `Actúa como un director de producción de videos de finanzas. 
-    Crea un JSON maestro para un video sobre: "${tema}".
-    Reglas:
-    1. Genera 10 escenas. 
-    2. Formato: { "proyecto": "${tema}", "escenas": [ { "id": 1, "texto_audio": "...", "texto_overlay": "...", "imagen_prompt": "..." } ] }
-    3. Estilo visual: 2D Corporate Illustration, flat colors.
-    Responde ÚNICAMENTE con el objeto JSON puro.`;
-
-    // URL CORREGIDA: Versión v1 (Estable)
+    // LA URL CORREGIDA QUE EVITA EL ERROR
     const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     try {
@@ -271,33 +232,24 @@ async function ejecutarOrquestador() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: promptMaster }] }],
-                generationConfig: {
+                contents: [{ parts: [{ text: promptFinal }] }],
+                generationConfig: { 
                     temperature: 0.7,
-                    responseMimeType: "application/json"
+                    responseMimeType: (tipo === 'orquestador') ? "application/json" : "text/plain"
                 }
             })
         });
 
         const data = await response.json();
-        
         if (data.error) {
-            outputBox.textContent = "Error de Gemini: " + data.error.message;
+            outputBox.textContent = "Error: " + data.error.message;
         } else {
-            const finalJson = data.candidates[0].content.parts[0].text;
-            outputBox.textContent = finalJson;
+            outputBox.textContent = data.candidates[0].content.parts[0].text;
         }
-    } catch (error) {
-        outputBox.textContent = "Error de conexión: " + error.message;
+    } catch (e) {
+        outputBox.textContent = "Error de conexión: " + e.message;
     }
 }
-
-function copyOutput(id) {
-    const text = document.getElementById(id).textContent;
-    navigator.clipboard.writeText(text);
-    alert("Copiado al portapapeles. Pégalo en tu script de Python.");
-}
 </script>
-
 </body>
 </html>
