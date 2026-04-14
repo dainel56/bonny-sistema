@@ -287,6 +287,13 @@ select option{background:var(--navy2);color:var(--text)}
     <div class="sb-logo-name">🐰 Bonny Finance</div>
     <div class="sb-logo-ver">Sistema v5.0 · 2026</div>
   </div>
+  <div style="padding:10px 14px;border-bottom:1px solid var(--border)">
+    <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;font-family:'DM Mono',monospace">🔑 Gemini API Key</div>
+    <input type="password" id="gemApiKey" placeholder="AIzaSy..."
+      style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'DM Mono',monospace;font-size:10px;padding:6px 8px;outline:none;box-sizing:border-box"
+      oninput="saveApiKey()">
+    <div style="font-size:9px;margin-top:4px;font-family:'DM Mono',monospace" id="apiKeyStatus" class="badge-red">Sin configurar</div>
+  </div>
 
   <div class="sb-section">🤖 IA Automatizada</div>
   <button class="sb-btn" onclick="nav('orquestador')" style="background:linear-gradient(135deg,rgba(0,212,170,.15),rgba(244,163,0,.1));border-left-color:var(--gold)"><span class="sb-icon">🚀</span>Orquestador IA</button>
