@@ -1812,22 +1812,26 @@ function updateStatus() {
   }
 }
 
-// --- 1. NAVEGACIÓN CORREGIDA ---
+// --- 1. NAVEGACIÓN (Repara los botones de la sidebar) ---
 function nav(panelId) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  
   const target = document.getElementById('p-' + panelId);
   if (target) {
     target.classList.add('active');
-    if (event && event.currentTarget) event.currentTarget.classList.add('active');
+    if (event && event.currentTarget) {
+      event.currentTarget.classList.add('active');
+    }
   }
   window.scrollTo(0, 0);
 }
 
-// --- 2. EL MOTOR MULTI-RUTA (Soluciona el error de "Not Found") ---
+// --- 2. MOTOR DE INTELIGENCIA (Solución al error "Not Found") ---
 async function runOrquestador() {
   const tema = document.getElementById('oq-tema').value;
   if (!tema) { showToast("⚠️ Escribe un tema"); return; }
+
   const btn = event.currentTarget;
   const originalText = btn.innerHTML;
   btn.innerHTML = '<span class="spinner"></span> Conectando...';
@@ -1835,29 +1839,32 @@ async function runOrquestador() {
 
   const prompt = `Actúa como Director de Producción de Bonny Finance. Genera un JSON maestro para un video sobre: "${tema}". Responde ÚNICAMENTE el objeto JSON puro.`;
 
-  // INTENTO 1: v1beta (La más probable para Flash 1.5)
-  let exito = await intentarConexion(prompt, 'v1beta', 'gemini-1.5-flash');
-  
-  // INTENTO 2: Si falló, probamos v1 con gemini-pro (El más compatible)
-  if (!exito) {
-    console.log("Reintentando con ruta alternativa...");
-    exito = await intentarConexion(prompt, 'v1', 'gemini-pro');
+  // SISTEMA DE RUTEO AUTOMÁTICO
+  const rutas = [
+    { v: 'v1beta', m: 'gemini-1.5-flash' }, // Ruta más probable para Flash
+    { v: 'v1',     m: 'gemini-pro' },       // Ruta de alta compatibilidad
+    { v: 'v1beta', m: 'gemini-pro' }        // Ruta de respaldo
+  ];
+
+  let logrado = false;
+  for (let ruta of rutas) {
+    console.log(`Intentando conectar via ${ruta.v} con ${ruta.m}...`);
+    logrado = await intentarLlamada(prompt, ruta.v, ruta.m);
+    if (logrado) break;
   }
 
-  if (!exito) {
-    document.getElementById('oq-json-out').innerText = "❌ Error: No se pudo conectar con ningún modelo de Gemini. Revisa tu API Key.";
+  if (!logrado) {
+    document.getElementById('oq-json-out').innerText = "❌ Error crítico: Ningún modelo respondió. Verifica que tu API Key sea de Google AI Studio.";
   }
 
   btn.innerHTML = originalText;
   btn.disabled = false;
 }
 
-async function intentarConexion(prompt, version, modelo) {
+async function intentarLlamada(prompt, version, modelo) {
   const apiKey = localStorage.getItem('bonny_api_key');
-  if (!apiKey) return false;
-
   const url = `https://generativelanguage.googleapis.com/${version}/models/${modelo}:generateContent?key=${apiKey}`;
-  
+
   try {
     const response = await fetch(url, {
       method: 'POST',
@@ -1873,14 +1880,14 @@ async function intentarConexion(prompt, version, modelo) {
     
     document.getElementById('oq-json-out').innerText = cleanJson;
     procesarRespuestaOrquestador(cleanJson);
-    showToast("✨ ¡Conexión exitosa!");
+    showToast("✨ Conexión Exitosa");
     return true;
   } catch (e) {
     return false;
   }
 }
 
-// --- 3. UTILIDADES ---
+// --- 3. UTILIDADES Y CIERRE ---
 function exportarJSON() {
   if (!jsonMaestroData) { showToast("❌ No hay datos"); return; }
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(jsonMaestroData, null, 2));
