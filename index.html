@@ -1650,7 +1650,7 @@ RESPONDE ÚNICAMENTE con el JSON, sin texto adicional, sin markdown, sin explica
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
           contents: [{parts: [{text: prompt}]}],
-          generationConfig: {temperature: 0.7, maxOutputTokens: 8192}
+          generationConfig: {temperature: 0.7, maxOutputTokens: 65536}
         })
       }
     );
@@ -1667,7 +1667,21 @@ RESPONDE ÚNICAMENTE con el JSON, sin texto adicional, sin markdown, sin explica
     // Clean JSON from markdown if present
     rawText = rawText.split('```json').join('').split('```').join('').trim();
     
-    var jsonData = JSON.parse(rawText);
+    // Fix truncated JSON if model cut off output
+    var trimmed = rawText.trim();
+    // Ensure JSON is complete - find last valid closing brace
+    var lastBrace = trimmed.lastIndexOf('}');
+    var lastBracket = trimmed.lastIndexOf(']');
+    if(lastBrace > lastBracket && !trimmed.endsWith('}}')){
+      // Try to close incomplete JSON
+      var openBraces = (trimmed.match(/{/g)||[]).length;
+      var closeBraces = (trimmed.match(/}/g)||[]).length;
+      var openBrackets = (trimmed.match(/\[/g)||[]).length;
+      var closeBrackets = (trimmed.match(/\]/g)||[]).length;
+      while(closeBrackets < openBrackets) { trimmed += ']'; closeBrackets++; }
+      while(closeBraces < openBraces) { trimmed += '}'; closeBraces++; }
+    }
+    var jsonData = JSON.parse(trimmed);
     jsonMaestroData = jsonData;
 
     setProgreso(90, 'Renderizando resultado...');
