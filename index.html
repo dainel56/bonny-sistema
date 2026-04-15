@@ -1010,8 +1010,18 @@ ATMOSPHERE: [INSERTAR AQUÍ: descripción de la escena, emoción, acción, entor
       </div>
     </div>
     <div class="form-group">
+      <label>Tipo de narrativa</label>
+      <select id="oq-narrativa">
+        <option value="mixta">Mixta yo+tu — RECOMENDADA (mayor viralidad)</option>
+        <option value="primera">Primera persona — yo (mayor identificacion)</option>
+        <option value="segunda">Segunda persona — tu (mayor engagement)</option>
+        <option value="tercera">Tercera persona (educativa)</option>
+        <option value="documental">Documental (datos + casos reales)</option>
+      </select>
+    </div>
+    <div class="form-group">
       <label>Contexto extra (opcional)</label>
-      <input type="text" id="oq-ctx" placeholder="ej: enfocado en México, audiencia 25-35, incluir dato INEGI">
+      <input type="text" id="oq-ctx" placeholder="ej: enfocado en Mexico, audiencia 25-35, incluir dato INEGI">
     </div>
     <div class="form-group" style="margin-bottom:12px">
       <label>Motor de generacion</label>
@@ -1608,7 +1618,7 @@ REGLAS OBLIGATORIAS:
 - duracion_estimada entre 9 y 12 segundos por escena
 - texto_audio MINIMO 30 palabras por escena
 - Mencionar "Bonny" MAXIMO 3 veces. Usar yo, me, mi el resto
-- Narracion PRIMERA PERSONA conversacional
+- ' + '- Narrativa: ' + getNarrativa() + '
 - Situaciones especificas LATAM: quincena, tarjeta, fin de mes
 - PROHIBIDO sonar academico
 - personaje_pos: "derecha" o "izquierda" (para que Python sepa donde colocar a Bonny)
@@ -1794,6 +1804,19 @@ function exportarGuion(){
   showToast();
 }
 
+function getNarrativa(){
+  var el = document.getElementById('oq-narrativa');
+  if(!el) return 'MIXTA yo+tu alternando primera y segunda persona';
+  var map = {
+    'mixta':     'MIXTA yo+tu: alternar primera y segunda persona, combina identificacion con interpelacion directa',
+    'primera':   'PRIMERA PERSONA (yo,me,mi): el narrador habla como si le paso a el mismo',
+    'segunda':   'SEGUNDA PERSONA (tu,te): interpelar directamente al espectador en todo momento',
+    'tercera':   'TERCERA PERSONA: narrador observador externo, casos de personas y estadisticas',
+    'documental':'DOCUMENTAL: datos reales + casos concretos + Bonny analiza como experto'
+  };
+  return map[el.value] || map['mixta'];
+}
+
 function generarConMotor(){
   var motor = document.querySelector('input[name="motor"]:checked').value;
   if(motor === 'gemini'){
@@ -1828,6 +1851,7 @@ function generarPromptClaude(){
   p.push('   - Mencionar Bonny MAXIMO 3 veces. Usar yo, me, mi');
   p.push('   - PRIMERA PERSONA, conversacional, situaciones LATAM reales');
   p.push('   - PROHIBIDO sonar academico');
+  p.push('   - TIPO DE NARRATIVA: ' + getNarrativa());
   p.push('');
   p.push('4. JSON MAESTRO con ' + n + ' escenas:');
   p.push('{"proyecto":"slug-kebab","titulo_seo":"...","idioma":"es-MX","duracion_minutos":'+dur+',"total_escenas":'+n+',"afiliado":"'+(af||'ninguno')+'","escenas":[{"id":1,"tipo_escena":"A","texto_audio":"min 30 palabras...","duracion_estimada":10,"texto_overlay":"FRASE","imagen_prompt":"english prompt...","personaje_pos":"derecha","es_short":false}],"metadata_seo":{"descripcion":"...","tags":["tag1"]}}');
