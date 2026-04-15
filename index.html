@@ -1013,9 +1013,22 @@ ATMOSPHERE: [INSERTAR AQUÍ: descripción de la escena, emoción, acción, entor
       <label>Contexto extra (opcional)</label>
       <input type="text" id="oq-ctx" placeholder="ej: enfocado en México, audiencia 25-35, incluir dato INEGI">
     </div>
+    <div class="form-group" style="margin-bottom:12px">
+      <label>Motor de generacion</label>
+      <div style="display:flex;gap:16px;margin-top:6px;flex-wrap:wrap">
+        <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;color:var(--text);letter-spacing:0;text-transform:none;font-family:Space Grotesk,sans-serif">
+          <input type="radio" name="motor" value="gemini" checked style="accent-color:var(--teal)">
+          Gemini AI Studio <span style="font-size:10px;color:var(--muted)">(automatico)</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;color:var(--text);letter-spacing:0;text-transform:none;font-family:Space Grotesk,sans-serif">
+          <input type="radio" name="motor" value="claude" style="accent-color:var(--gold)">
+          Claude Project <span style="font-size:10px;color:var(--muted)">(mas calidad)</span>
+        </label>
+      </div>
+    </div>
     <div class="btn-row">
-      <button class="btn btn-gold" id="btn-generar-json" onclick="generarJSONMaestro()">
-        🤖 Generar JSON Maestro con Gemini
+      <button class="btn btn-gold" id="btn-generar-json" onclick="generarConMotor()">
+        Generar JSON Maestro
       </button>
     </div>
   </div>
@@ -1519,7 +1532,7 @@ function saveApiKey(){
   var k = document.getElementById('gemApiKey').value.trim();
   if(k) {
     localStorage.setItem('bonny_gem_key', k);
-    document.getElementById('apiKeyStatus').textContent = '✓ Key guardada localmente';
+    document.getElementById('apiKeyStatus').textContent = 'OK Key guardada localmente';
     document.getElementById('apiKeyStatus').style.color = 'var(--green)';
   }
 }
@@ -1527,7 +1540,7 @@ function loadApiKey(){
   var k = localStorage.getItem('bonny_gem_key') || '';
   if(k) {
     document.getElementById('gemApiKey').value = k;
-    document.getElementById('apiKeyStatus').textContent = '✓ Key cargada';
+    document.getElementById('apiKeyStatus').textContent = 'OK Key cargada';
     document.getElementById('apiKeyStatus').style.color = 'var(--green)';
   }
 }
@@ -1559,7 +1572,7 @@ var jsonMaestroData = null;
 
 async function generarJSONMaestro(){
   var apiKey = localStorage.getItem('bonny_gem_key');
-  if(!apiKey){ alert('Configura tu API Key de Gemini en el menú lateral'); return; }
+  if(!apiKey){ alert('Configura tu API Key de Gemini en el menu lateral'); return; }
   
   var tema = document.getElementById('oq-tema').value.trim();
   if(!tema){ alert('Ingresa el tema del video'); return; }
@@ -1577,10 +1590,10 @@ async function generarJSONMaestro(){
 
   var bonnyDesc = 'Young adult Latin American man late 20s, short black messy hair, warm brown skin, plain navy blue polo shirt, mature adult face, 2D flat corporate illustration style, teal and navy color palette';
 
-  var prompt = `Eres el sistema de producción de Bonny Finance. Genera un JSON MAESTRO completo para un video de YouTube sobre finanzas personales LATAM.
+  var prompt = `Eres el sistema de produccion de Bonny Finance. Genera un JSON MAESTRO completo para un video de YouTube sobre finanzas personales LATAM.
 
 TEMA: "${tema}"
-DURACIÓN: ${dur} minutos
+DURACION: ${dur} minutos
 ESCENAS: ${nEscenas} escenas (una por cada 10 segundos)
 TIPO: ${tipo === 'A' ? 'Educativo con afiliado integrado narrativamente' : tipo === 'B' ? 'Review directa de producto' : 'Educativo puro sin afiliado'}
 ${afiliado ? 'AFILIADO: ' + afiliado : 'SIN AFILIADO'}
@@ -1589,42 +1602,42 @@ ${ctx ? 'CONTEXTO: ' + ctx : ''}
 PERSONAJE BONNY: ${bonnyDesc}
 
 REGLAS OBLIGATORIAS:
-- imagen_prompt SIEMPRE en inglés
-- texto_audio y texto_overlay SIEMPRE en español
-- Marcar ES_SHORT=true en exactamente 5 escenas más impactantes (hook, giro, solución, CTA)
+- imagen_prompt SIEMPRE en ingles
+- texto_audio y texto_overlay SIEMPRE en espanol
+- Marcar ES_SHORT=true en exactamente 5 escenas mas impactantes (hook, giro, solucion, CTA)
 - duracion_estimada entre 9 y 12 segundos por escena
 - texto_audio MINIMO 30 palabras por escena
 - Mencionar "Bonny" MAXIMO 3 veces. Usar yo, me, mi el resto
 - Narracion PRIMERA PERSONA conversacional
 - Situaciones especificas LATAM: quincena, tarjeta, fin de mes
 - PROHIBIDO sonar academico
-- personaje_pos: "derecha" o "izquierda" (para que Python sepa dónde colocar a Bonny)
-- tipo_escena: "A" (solo Bonny narrativo), "B" (Bonny + gráfico/datos), "C" (texto tipográfico)
-- Distribución: TIPO-A 40%, TIPO-B 35%, TIPO-C 25%
+- personaje_pos: "derecha" o "izquierda" (para que Python sepa donde colocar a Bonny)
+- tipo_escena: "A" (solo Bonny narrativo), "B" (Bonny + grafico/datos), "C" (texto tipografico)
+- Distribucion: TIPO-A 40%, TIPO-B 35%, TIPO-C 25%
 
-REGLAS DE HUMANIZACIÓN (CRÍTICAS para retención):
-- Mencionar "Bonny" MÁXIMO 3 veces en todo el guion. Usar "yo", "me", "mi" el resto del tiempo
-- Narración en PRIMERA PERSONA — el espectador debe sentir que le está hablando un amigo
-- Situaciones ultra específicas de la vida real LATAM: quincena, deudas de tarjeta, fin de mes
-- Frases cotidianas: "mano", "a fin de mes", "el chiste es que", "y ahí fue cuando entendí"
-- Momentos de vulnerabilidad real: errores, vergüenzas, fracasos financieros concretos
-- Cada escena debe hacer pensar al espectador: "eso me pasó exactamente a mí"
-- PROHIBIDO sonar académico o de manual — hablar como conversación entre amigos
+REGLAS DE HUMANIZACION (CRITICAS para retencion):
+- Mencionar "Bonny" MAXIMO 3 veces en todo el guion. Usar "yo", "me", "mi" el resto del tiempo
+- Narracion en PRIMERA PERSONA - el espectador debe sentir que le esta hablando un amigo
+- Situaciones ultra especificas de la vida real LATAM: quincena, deudas de tarjeta, fin de mes
+- Frases cotidianas: "mano", "a fin de mes", "el chiste es que", "y ahi fue cuando entendi"
+- Momentos de vulnerabilidad real: errores, verguenzas, fracasos financieros concretos
+- Cada escena debe hacer pensar al espectador: "eso me paso exactamente a mi"
+- PROHIBIDO sonar academico o de manual - hablar como conversacion entre amigos
 
 ESTRUCTURA DEL GUION:
-- Escenas 01-03: Hook (tensión máxima, dato impactante)
-- Escenas 04-10: Problema (Bonny en la situación)  
-- Escenas 11-20: Datos y estadísticas reales
-- Escenas 21-32: Análisis y explicación
+- Escenas 01-03: Hook (tension maxima, dato impactante)
+- Escenas 04-10: Problema (Bonny en la situacion)  
+- Escenas 11-20: Datos y estadisticas reales
+- Escenas 21-32: Analisis y explicacion
 - Escenas 33-36: Giro sorpresa
-- Escenas 37-48: Solución paso a paso
+- Escenas 37-48: Solucion paso a paso
 - Escenas 49-${nEscenas}: Resumen y CTA
 
-RESPONDE ÚNICAMENTE con el JSON, sin texto adicional, sin markdown, sin explicaciones:
+RESPONDE UNICAMENTE con el JSON, sin texto adicional, sin markdown, sin explicaciones:
 
 {
   "proyecto": "slug-del-tema-en-kebab-case",
-  "titulo_seo": "Título optimizado para YouTube máx 60 caracteres",
+  "titulo_seo": "Titulo optimizado para YouTube max 60 caracteres",
   "idioma": "es-MX",
   "duracion_minutos": ${dur},
   "total_escenas": ${nEscenas},
@@ -1633,7 +1646,7 @@ RESPONDE ÚNICAMENTE con el JSON, sin texto adicional, sin markdown, sin explica
     {
       "id": 1,
       "tipo_escena": "A",
-      "texto_audio": "Guion hablado para esta escena en español natural y conversacional",
+      "texto_audio": "Guion hablado para esta escena en espanol natural y conversacional",
       "duracion_estimada": 10,
       "texto_overlay": "FRASE CORTA",
       "imagen_prompt": "Detailed image prompt in English for Gemini Imagen 4, corporate flat illustration style, ${bonnyDesc}",
@@ -1642,7 +1655,7 @@ RESPONDE ÚNICAMENTE con el JSON, sin texto adicional, sin markdown, sin explica
     }
   ],
   "metadata_seo": {
-    "descripcion": "Descripción para YouTube con keywords",
+    "descripcion": "Descripcion para YouTube con keywords",
     "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
   }
 }`;
@@ -1693,14 +1706,14 @@ RESPONDE ÚNICAMENTE con el JSON, sin texto adicional, sin markdown, sin explica
 
     setProgreso(90, 'Renderizando resultado...');
     renderJsonMaestro(jsonData);
-    setProgreso(100, '✓ JSON Maestro generado exitosamente');
+    setProgreso(100, 'OK JSON Maestro generado exitosamente');
     
     setTimeout(function(){
       document.getElementById('oq-progreso-card').style.display = 'none';
     }, 2000);
 
   } catch(e) {
-    setProgreso(0, '✗ Error: ' + e.message);
+    setProgreso(0, 'X Error: ' + e.message);
     document.getElementById('oq-status').style.color = 'var(--red)';
     alert('Error generando JSON: ' + e.message);
   }
@@ -1716,16 +1729,16 @@ function renderJsonMaestro(data){
   var shorts = data.escenas.filter(function(e){return e.es_short;});
   document.getElementById('oq-resumen').innerHTML =
     miniStatCard('Escenas totales', data.total_escenas, 'del guion completo') +
-    miniStatCard('Duración', data.duracion_minutos + ' min', 'video largo') +
+    miniStatCard('Duracion', data.duracion_minutos + ' min', 'video largo') +
     miniStatCard('4 Shorts', shorts.length, 'momentos identificados') +
-    miniStatCard('Afiliado', data.afiliado === 'ninguno' ? 'Ninguno' : '✓', data.afiliado !== 'ninguno' ? data.afiliado : 'video educativo puro');
+    miniStatCard('Afiliado', data.afiliado === 'ninguno' ? 'Ninguno' : 'OK', data.afiliado !== 'ninguno' ? data.afiliado : 'video educativo puro');
 
   // JSON display
   document.getElementById('oq-json-out').textContent = JSON.stringify(data, null, 2);
 
   // Shorts
   var shortsHtml = shorts.map(function(s){
-    return '<div class="mini-card"><div class="mini-card-label">Escena ' + s.id + ' — es_short ✓</div>' +
+    return '<div class="mini-card"><div class="mini-card-label">Escena ' + s.id + ' - es_short OK</div>' +
       '<div style="font-size:12px;color:var(--text);margin:4px 0">' + s.texto_overlay + '</div>' +
       '<div class="mini-card-sub" style="font-size:10px">' + s.texto_audio.substring(0,80) + '...</div></div>';
   }).join('');
@@ -1779,6 +1792,153 @@ function exportarGuion(){
   a.download = (d.proyecto||'guion') + '_capcut.txt';
   a.click();
   showToast();
+}
+
+function generarConMotor(){
+  var motor = document.querySelector('input[name="motor"]:checked').value;
+  if(motor === 'gemini'){
+    generarJSONMaestro();
+  } else {
+    generarPromptClaude();
+  }
+}
+
+function generarPromptClaude(){
+  var tema = document.getElementById('oq-tema').value.trim();
+  if(!tema){ alert('Ingresa el tema del video'); return; }
+
+  var dur  = document.getElementById('oq-dur').value;
+  var tipo = document.getElementById('oq-tipo').value;
+  var af   = document.getElementById('oq-afiliado').value;
+  var ctx  = document.getElementById('oq-ctx').value.trim();
+  var n    = Math.round(parseFloat(dur) * 6);
+
+  var tipoLabel = tipo === 'A' ? 'A (Educativo con afiliado integrado)' :
+                  tipo === 'B' ? 'B (Review directa de producto)' :
+                                 'C (Educativo puro sin afiliado)';
+
+  var prompt = 'ACTUALIZAR ' + tema + ' Tipo-' + tipo + (af ? ' ' + af : '') + '
+
+';
+  prompt += '---
+
+';
+  prompt += 'Usa el sistema Bonny Finance v5.0 completo. Genera:
+
+';
+  prompt += '1. CLASIFICACION DEL VIDEO
+';
+  prompt += '   - Tipo ' + tipoLabel + '
+';
+  prompt += (af ? '   - Afiliado: ' + af + '
+' : '   - Sin afiliado
+');
+  prompt += '
+2. METADATA SEO
+';
+  prompt += '   - Titulo (max 60 caracteres con keyword)
+';
+  prompt += '   - Descripcion (primeras 2 lineas con keyword + CTA)
+';
+  prompt += '   - 10 tags relevantes
+';
+  prompt += '
+3. GUION COMPLETO - ' + dur + ' minutos
+';
+  prompt += '   REGLAS DE HUMANIZACION:
+';
+  prompt += '   - Mencionar "Bonny" MAXIMO 3 veces. Usar yo, me, mi el resto
+';
+  prompt += '   - Narracion en PRIMERA PERSONA, conversacional, vulnerable
+';
+  prompt += '   - Situaciones especificas LATAM: quincena, tarjeta, fin de mes
+';
+  prompt += '   - PROHIBIDO sonar academico
+
+';
+  prompt += '4. JSON MAESTRO COMPLETO con ' + n + ' escenas en este formato exacto:
+';
+  prompt += '{"proyecto":"slug-kebab","titulo_seo":"...","idioma":"es-MX",';
+  prompt += '"duracion_minutos":' + dur + ',"total_escenas":' + n + ',';
+  prompt += '"afiliado":"' + (af||'ninguno') + '",';
+  prompt += '"escenas":[{"id":1,"tipo_escena":"A","texto_audio":"min 30 palabras...",';
+  prompt += '"duracion_estimada":10,"texto_overlay":"FRASE CORTA",';
+  prompt += '"imagen_prompt":"english prompt flat corporate illustration...",';
+  prompt += '"personaje_pos":"derecha","es_short":false}],';
+  prompt += '"metadata_seo":{"descripcion":"...","tags":["tag1","tag2"]}}
+
+';
+  prompt += 'REGLAS DEL JSON:
+';
+  prompt += '- imagen_prompt SIEMPRE en ingles
+';
+  prompt += '- texto_audio MINIMO 30 palabras por escena
+';
+  prompt += '- ES_SHORT=true exactamente en 5 escenas impactantes
+';
+  prompt += '- Distribucion: Tipo-A 40%, Tipo-B 35%, Tipo-C 25%
+';
+  if(ctx) prompt += '
+CONTEXTO: ' + ctx + '
+';
+
+  // Show prompt in a modal for copying to Claude
+  document.getElementById('oq-prog-card').style.display = 'block';
+  document.getElementById('oq-prf').style.width = '100%';
+  document.getElementById('oq-st').innerHTML = 
+    '<strong style="color:var(--gold)">Prompt listo para Claude Project Bonny</strong><br>' +
+    '<small>Copia el prompt, pegalo en tu Proyecto Claude de Bonny Finance y ' +
+    'copia el JSON que genera de vuelta aqui usando el boton "Importar JSON"</small>';
+
+  // Store prompt and show copy button
+  window._claudePrompt = prompt;
+  
+  // Add copy + import buttons if not already there
+  if(!document.getElementById('claude-actions')){
+    var div = document.createElement('div');
+    div.id = 'claude-actions';
+    div.style.cssText = 'display:flex;gap:8px;margin-top:12px;flex-wrap:wrap';
+    div.innerHTML = 
+      '<button class="btn btn-primary btn-sm" onclick="copiarPromptClaude()">Copiar prompt para Claude</button>' +
+      '<textarea id="claude-json-input" rows="4" placeholder="Pega aqui el JSON que genero Claude..." ' +
+      'style="width:100%;margin-top:8px;background:var(--card);border:1px solid var(--border);' +
+      'border-radius:6px;color:var(--text);font-family:DM Mono,monospace;font-size:10px;padding:8px"></textarea>' +
+      '<button class="btn btn-outline btn-sm" onclick="importarJSONdeClaude()">Importar JSON de Claude</button>';
+    document.getElementById('oq-prog-card').appendChild(div);
+  }
+  document.getElementById('claude-actions').style.display = 'flex';
+  document.getElementById('claude-actions').style.flexDirection = 'column';
+}
+
+function copiarPromptClaude(){
+  if(!window._claudePrompt) return;
+  navigator.clipboard.writeText(window._claudePrompt).then(function(){
+    showToast();
+  }).catch(function(){
+    var ta = document.createElement('textarea');
+    ta.value = window._claudePrompt;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast();
+  });
+}
+
+function importarJSONdeClaude(){
+  var raw = document.getElementById('claude-json-input').value.trim();
+  if(!raw){ alert('Pega el JSON de Claude primero'); return; }
+  try {
+    var fence = String.fromCharCode(96,96,96);
+    raw = raw.split(fence+'json').join('').split(fence).join('').trim();
+    var data = JSON.parse(raw);
+    jsonMaestroData = data;
+    renderJsonMaestro(data);
+    document.getElementById('oq-prog-card').style.display = 'none';
+    showToast();
+  } catch(e) {
+    alert('Error al parsear JSON: ' + e.message);
+  }
 }
 
 </script>
