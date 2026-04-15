@@ -1806,108 +1806,56 @@ function generarConMotor(){
 function generarPromptClaude(){
   var tema = document.getElementById('oq-tema').value.trim();
   if(!tema){ alert('Ingresa el tema del video'); return; }
-
   var dur  = document.getElementById('oq-dur').value;
   var tipo = document.getElementById('oq-tipo').value;
   var af   = document.getElementById('oq-afiliado').value;
   var ctx  = document.getElementById('oq-ctx').value.trim();
   var n    = Math.round(parseFloat(dur) * 6);
-
-  var tipoLabel = tipo === 'A' ? 'A (Educativo con afiliado integrado)' :
-                  tipo === 'B' ? 'B (Review directa de producto)' :
-                                 'C (Educativo puro sin afiliado)';
-
-  var prompt = 'ACTUALIZAR ' + tema + ' Tipo-' + tipo + (af ? ' ' + af : '') + '
-
-';
-  prompt += '---
-
-';
-  prompt += 'Usa el sistema Bonny Finance v5.0 completo. Genera:
-
-';
-  prompt += '1. CLASIFICACION DEL VIDEO
-';
-  prompt += '   - Tipo ' + tipoLabel + '
-';
-  prompt += (af ? '   - Afiliado: ' + af + '
-' : '   - Sin afiliado
-');
-  prompt += '
-2. METADATA SEO
-';
-  prompt += '   - Titulo (max 60 caracteres con keyword)
-';
-  prompt += '   - Descripcion (primeras 2 lineas con keyword + CTA)
-';
-  prompt += '   - 10 tags relevantes
-';
-  prompt += '
-3. GUION COMPLETO - ' + dur + ' minutos
-';
-  prompt += '   REGLAS DE HUMANIZACION:
-';
-  prompt += '   - Mencionar "Bonny" MAXIMO 3 veces. Usar yo, me, mi el resto
-';
-  prompt += '   - Narracion en PRIMERA PERSONA, conversacional, vulnerable
-';
-  prompt += '   - Situaciones especificas LATAM: quincena, tarjeta, fin de mes
-';
-  prompt += '   - PROHIBIDO sonar academico
-
-';
-  prompt += '4. JSON MAESTRO COMPLETO con ' + n + ' escenas en este formato exacto:
-';
-  prompt += '{"proyecto":"slug-kebab","titulo_seo":"...","idioma":"es-MX",';
-  prompt += '"duracion_minutos":' + dur + ',"total_escenas":' + n + ',';
-  prompt += '"afiliado":"' + (af||'ninguno') + '",';
-  prompt += '"escenas":[{"id":1,"tipo_escena":"A","texto_audio":"min 30 palabras...",';
-  prompt += '"duracion_estimada":10,"texto_overlay":"FRASE CORTA",';
-  prompt += '"imagen_prompt":"english prompt flat corporate illustration...",';
-  prompt += '"personaje_pos":"derecha","es_short":false}],';
-  prompt += '"metadata_seo":{"descripcion":"...","tags":["tag1","tag2"]}}
-
-';
-  prompt += 'REGLAS DEL JSON:
-';
-  prompt += '- imagen_prompt SIEMPRE en ingles
-';
-  prompt += '- texto_audio MINIMO 30 palabras por escena
-';
-  prompt += '- ES_SHORT=true exactamente en 5 escenas impactantes
-';
-  prompt += '- Distribucion: Tipo-A 40%, Tipo-B 35%, Tipo-C 25%
-';
-  if(ctx) prompt += '
-CONTEXTO: ' + ctx + '
-';
-
-  // Show prompt in a modal for copying to Claude
+  var tipoLabel = tipo==='A'?'A (Educativo con afiliado)':tipo==='B'?'B (Review directa)':'C (Educativo puro)';
+  var NL = '\n';
+  var p = [];
+  p.push('ACTUALIZAR ' + tema + ' Tipo-' + tipo + (af?' '+af:''));
+  p.push('');
+  p.push('---');
+  p.push('');
+  p.push('Usa el sistema Bonny Finance v5.0. Genera:');
+  p.push('');
+  p.push('1. CLASIFICACION: Tipo ' + tipoLabel + (af?' | Afiliado: '+af:''));
+  p.push('');
+  p.push('2. METADATA SEO: titulo max 60 chars, descripcion, 10 tags');
+  p.push('');
+  p.push('3. GUION COMPLETO - ' + dur + ' minutos');
+  p.push('   - Mencionar Bonny MAXIMO 3 veces. Usar yo, me, mi');
+  p.push('   - PRIMERA PERSONA, conversacional, situaciones LATAM reales');
+  p.push('   - PROHIBIDO sonar academico');
+  p.push('');
+  p.push('4. JSON MAESTRO con ' + n + ' escenas:');
+  p.push('{"proyecto":"slug-kebab","titulo_seo":"...","idioma":"es-MX","duracion_minutos":'+dur+',"total_escenas":'+n+',"afiliado":"'+(af||'ninguno')+'","escenas":[{"id":1,"tipo_escena":"A","texto_audio":"min 30 palabras...","duracion_estimada":10,"texto_overlay":"FRASE","imagen_prompt":"english prompt...","personaje_pos":"derecha","es_short":false}],"metadata_seo":{"descripcion":"...","tags":["tag1"]}}');
+  p.push('');
+  p.push('REGLAS JSON:');
+  p.push('- imagen_prompt en ingles siempre');
+  p.push('- texto_audio MINIMO 30 palabras');
+  p.push('- ES_SHORT=true en 5 escenas');
+  p.push('- Distribucion A 40%, B 35%, C 25%');
+  if(ctx) p.push('CONTEXTO: ' + ctx);
+  window._claudePrompt = p.join(NL);
   document.getElementById('oq-prog-card').style.display = 'block';
   document.getElementById('oq-prf').style.width = '100%';
-  document.getElementById('oq-st').innerHTML = 
+  document.getElementById('oq-st').innerHTML =
     '<strong style="color:var(--gold)">Prompt listo para Claude Project Bonny</strong><br>' +
-    '<small>Copia el prompt, pegalo en tu Proyecto Claude de Bonny Finance y ' +
-    'copia el JSON que genera de vuelta aqui usando el boton "Importar JSON"</small>';
-
-  // Store prompt and show copy button
-  window._claudePrompt = prompt;
-  
-  // Add copy + import buttons if not already there
+    '<small>1. Copia el prompt  2. Pegalo en Claude Project  3. Copia el JSON resultado  4. Pegalo abajo e importa</small>';
   if(!document.getElementById('claude-actions')){
     var div = document.createElement('div');
     div.id = 'claude-actions';
-    div.style.cssText = 'display:flex;gap:8px;margin-top:12px;flex-wrap:wrap';
-    div.innerHTML = 
+    div.style.cssText = 'display:flex;gap:8px;margin-top:12px;flex-direction:column';
+    div.innerHTML =
       '<button class="btn btn-primary btn-sm" onclick="copiarPromptClaude()">Copiar prompt para Claude</button>' +
-      '<textarea id="claude-json-input" rows="4" placeholder="Pega aqui el JSON que genero Claude..." ' +
-      'style="width:100%;margin-top:8px;background:var(--card);border:1px solid var(--border);' +
-      'border-radius:6px;color:var(--text);font-family:DM Mono,monospace;font-size:10px;padding:8px"></textarea>' +
+      '<textarea id="claude-json-input" rows="4" placeholder="Pega aqui el JSON generado por Claude..."' +
+      ' style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:DM Mono,monospace;font-size:10px;padding:8px"></textarea>' +
       '<button class="btn btn-outline btn-sm" onclick="importarJSONdeClaude()">Importar JSON de Claude</button>';
     document.getElementById('oq-prog-card').appendChild(div);
   }
   document.getElementById('claude-actions').style.display = 'flex';
-  document.getElementById('claude-actions').style.flexDirection = 'column';
 }
 
 function copiarPromptClaude(){
