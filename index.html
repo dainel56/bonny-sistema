@@ -288,17 +288,18 @@ select option{background:var(--navy2);color:var(--text)}
     <div class="sb-logo-ver">Sistema v5.0 · 2026</div>
   </div>
   <div style="padding:10px 14px;border-bottom:1px solid var(--border)">
-    <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;font-family:DM Mono,monospace">Gemini API Key</div>
+    <div style="font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;font-family:'DM Mono',monospace">🔑 Gemini API Key</div>
     <input type="password" id="gemApiKey" placeholder="AIzaSy..."
-      style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:DM Mono,monospace;font-size:10px;padding:6px 8px;outline:none;box-sizing:border-box"
+      style="width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'DM Mono',monospace;font-size:10px;padding:6px 8px;outline:none;box-sizing:border-box"
       oninput="saveApiKey()">
-    <div style="font-size:9px;margin-top:4px;font-family:DM Mono,monospace;color:var(--red)" id="apiKeyStatus">Sin configurar</div>
+    <div style="font-size:9px;margin-top:4px;font-family:'DM Mono',monospace" id="apiKeyStatus" class="badge-red">Sin configurar</div>
   </div>
 
-  <div class="sb-section">IA Automatizada</div>
-  <button class="sb-btn" onclick="nav('orq')"><span class="sb-icon">🚀</span>Orquestador IA</button>
+  <div class="sb-section">🤖 IA Automatizada</div>
+  <button class="sb-btn" onclick="nav('orquestador')" style="background:linear-gradient(135deg,rgba(0,212,170,.15),rgba(244,163,0,.1));border-left-color:var(--gold)"><span class="sb-icon">🚀</span>Orquestador IA</button>
+
   <div class="sb-divider"></div>
-  <div class="sb-section">Produccion</div>
+  <div class="sb-section">Producción Manual</div>
   <button class="sb-btn active" onclick="nav('produccion')"><span class="sb-icon">⚡</span>Nuevo video</button>
   <button class="sb-btn" onclick="nav('titulos')"><span class="sb-icon">📋</span>Títulos CTR</button>
   <button class="sb-btn" onclick="nav('miniaturas')"><span class="sb-icon">🖼</span>Miniaturas</button>
@@ -584,6 +585,7 @@ select option{background:var(--navy2);color:var(--text)}
           <option value="República Dominicana">República Dominicana</option>
           <option value="Chile">Chile</option>
           <option value="Perú">Perú</option>
+          <option value="USA — Latinos">🇺🇸 USA — Latinos</option>
         </select>
       </div>
       <div class="form-group">
@@ -881,7 +883,7 @@ ATMOSPHERE: [INSERTAR AQUÍ: descripción de la escena, emoción, acción, entor
         <div class="step-n">5</div>
         <div class="step-body">
           <div class="step-title">Configura el Proyecto Bonny en Claude.ai</div>
-          <div class="step-desc">En Claude.ai → Projects → Bonny Finance → Instructions. El sistema de producción v5.0 debe estar como instrucciones del proyecto para que los prompts funcionen correctamente.</div>
+          <div class="step-desc">En Claude.ai → Projects → Bonny Finance → Instructions. El sistema de producción v4.0 debe estar como instrucciones del proyecto para que los prompts funcionen correctamente.</div>
         </div>
       </div>
       <div class="step">
@@ -934,34 +936,55 @@ ATMOSPHERE: [INSERTAR AQUÍ: descripción de la escena, emoción, acción, entor
 </div>
 
 
-<div class="panel" id="p-orq">
+<!-- ════════════════════════════════════════════════════════════
+     PANEL: ORQUESTADOR IA v5.0
+═════════════════════════════════════════════════════════════ -->
+<div class="panel" id="p-orquestador">
   <div class="page-head">
     <div class="page-title">🚀 Orquestador <span class="teal">IA</span></div>
-    <div class="page-sub">Gemini genera el JSON Maestro completo — guion + 54 prompts + timestamps.</div>
+    <div class="page-sub">Gemini genera el JSON Maestro completo — guion + 54 prompts + timestamps. Python lo convierte en video.</div>
   </div>
 
-  <div class="card" style="background:rgba(244,163,0,.06);border-color:rgba(244,163,0,.2)">
+  <!-- API STATUS -->
+  <div class="card" id="api-status-card" style="background:rgba(244,163,0,.06);border-color:rgba(244,163,0,.2)">
     <div class="card-title" style="color:var(--gold)">Estado de la API</div>
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center">
-      <div class="mini-card"><div class="mini-card-label">Motor guion</div><div class="mini-card-val" style="font-size:14px">Gemini 2.5 Flash Lite</div><div class="mini-card-sub">Gratis</div></div>
-      <div class="mini-card"><div class="mini-card-label">Motor imagenes</div><div class="mini-card-val" style="font-size:14px">Vertex AI</div><div class="mini-card-sub">$300 credito</div></div>
-      <div class="mini-card"><div class="mini-card-label">Limite seguro</div><div class="mini-card-val" style="font-size:14px" id="imgs-usadas">0/500</div><div class="mini-card-sub">imagenes hoy</div></div>
+      <div class="mini-card">
+        <div class="mini-card-label">Motor de guion</div>
+        <div class="mini-card-val" style="font-size:14px">Gemini Flash</div>
+        <div class="mini-card-sub">Gratis · 15 RPM</div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-label">Motor de imágenes</div>
+        <div class="mini-card-val" style="font-size:14px">Imagen 4</div>
+        <div class="mini-card-sub">~25 imgs/día gratis</div>
+      </div>
+      <div class="mini-card">
+        <div class="mini-card-label">Límite seguro</div>
+        <div class="mini-card-val" style="font-size:14px" id="imgs-usadas">0 / 500</div>
+        <div class="mini-card-sub">imágenes hoy</div>
+      </div>
+    </div>
+    <div class="warn-box" style="margin-top:12px;margin-bottom:0">
+      ⚠️ Asegúrate de que tu API Key sea de <strong>Google AI Studio</strong> (aistudio.google.com) y NO de Google Cloud Console. Sin billing account vinculado = sin cargos posibles.
     </div>
   </div>
 
+  <!-- CONFIGURACIÓN -->
   <div class="card">
-    <div class="card-title">01 — Configuracion del video</div>
+    <div class="card-title">01 — Configuración del video</div>
     <div class="form-row">
       <div class="form-group">
         <label>Tema del video</label>
-        <input type="text" id="oq-tema" placeholder="ej: Por que tu tarjeta de debito te hace perder dinero">
+        <input type="text" id="oq-tema" placeholder="ej: Por qué tu tarjeta de débito te hace perder dinero">
       </div>
       <div class="form-group">
-        <label>Duracion objetivo</label>
+        <label>Duración objetivo</label>
         <select id="oq-dur">
-          <option value="13" selected>13 min (78 escenas) aprox 9 min real</option>
-          <option value="15">15 min (90 escenas) aprox 10 min real</option>
-          <option value="17">17 min (102 escenas) aprox 12 min real</option>
+          <option value="9">9 min (54 esc) ~ 6 min real</option>
+          <option value="13" selected>13 min (78 esc) ~ 9 min real</option>
+          <option value="15">15 min (90 esc) ~ 10 min real</option>
+          <option value="17">17 min (102 esc) ~ 12 min real</option>
         </select>
       </div>
     </div>
@@ -975,49 +998,109 @@ ATMOSPHERE: [INSERTAR AQUÍ: descripción de la escena, emoción, acción, entor
         </select>
       </div>
       <div>
-        <label>Afiliado</label>
+        <label>Afiliado (si aplica)</label>
         <select id="oq-afiliado">
           <option value="">Ninguno</option>
-          <option value="Nu (tarjeta sin buro)">Nu</option>
+          <option value="Nu (tarjeta sin buró)">Nu — tarjeta sin buró</option>
           <option value="Mercado Pago">Mercado Pago</option>
-          <option value="Hotmart">Hotmart</option>
-          <option value="Amazon Afiliados">Amazon</option>
+          <option value="Hotmart — curso de finanzas">Hotmart — curso finanzas</option>
+          <option value="Clip">Clip — cobros emprendedores</option>
+          <option value="Amazon Afiliados">Amazon Afiliados</option>
         </select>
       </div>
     </div>
     <div class="form-group">
       <label>Contexto extra (opcional)</label>
-      <input type="text" id="oq-ctx" placeholder="ej: enfocado en Mexico, audiencia 25-35">
+      <input type="text" id="oq-ctx" placeholder="ej: enfocado en México, audiencia 25-35, incluir dato INEGI">
     </div>
     <div class="btn-row">
-      <button class="btn btn-primary" id="btn-gen-json" onclick="generarJSON()">🤖 Generar JSON Maestro</button>
+      <button class="btn btn-gold" id="btn-generar-json" onclick="generarJSONMaestro()">
+        🤖 Generar JSON Maestro con Gemini
+      </button>
     </div>
   </div>
 
-  <div class="card" id="oq-prog-card" style="display:none">
-    <div class="card-title">Generando con Gemini...</div>
+  <!-- PROGRESO -->
+  <div class="card" id="oq-progreso-card" style="display:none">
+    <div class="card-title">Generando con Gemini IA...</div>
     <div style="background:rgba(0,0,0,.3);border-radius:6px;height:8px;overflow:hidden;margin-bottom:10px">
-      <div id="oq-prf" style="height:100%;background:var(--teal);border-radius:6px;width:0%;transition:width .5s"></div>
+      <div id="oq-prf" style="height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:6px;width:0%;transition:width .5s"></div>
     </div>
-    <div id="oq-st" style="font-family:DM Mono,monospace;font-size:12px;color:var(--muted)">Iniciando...</div>
+    <div id="oq-status" style="font-family:DM Mono,monospace;font-size:12px;color:var(--muted)">Iniciando...</div>
   </div>
 
-  <div class="card" id="oq-result-card" style="display:none">
+  <!-- JSON MAESTRO OUTPUT -->
+  <div class="card" id="oq-json-card" style="display:none">
     <div class="card-title">02 — JSON Maestro generado</div>
-    <div class="info-box">JSON listo. Exportalo y ejecuta el orquestador Python.</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px" id="oq-stats"></div>
+    <div class="info-box">
+      ✅ JSON listo. Exporta el archivo y colócalo en tu carpeta de Descargas para que Python lo procese automáticamente.
+    </div>
+
+    <!-- RESUMEN -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px" id="oq-resumen"></div>
+
+    <!-- JSON VIEWER -->
     <div class="output-header">
       <span class="output-label">JSON Maestro</span>
       <div style="display:flex;gap:6px">
-        <button class="btn btn-copy btn-sm" onclick="copyOutput('oq-out')">Copiar</button>
-        <button class="btn btn-primary btn-sm" onclick="exportJSON()">Exportar .json</button>
-        <button class="btn btn-outline btn-sm" onclick="exportGuion()">Exportar guion .txt</button>
+        <button class="btn btn-copy btn-sm" onclick="copyOutput('oq-json-out')">📋 Copiar JSON</button>
+        <button class="btn btn-primary btn-sm" onclick="exportarJSON()">⬇ Exportar proyecto_video.json</button>
       </div>
     </div>
-    <div class="output-box" id="oq-out" style="max-height:300px;font-size:11px"></div>
+    <div class="output-box" id="oq-json-out" style="max-height:350px;font-size:11px"></div>
+
+    <!-- SHORTS IDENTIFICADOS -->
     <div style="margin-top:14px">
-      <div class="card-title">Shorts identificados</div>
+      <div class="card-title">🎬 4 Shorts identificados</div>
       <div id="oq-shorts" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+    </div>
+
+    <!-- SIGUIENTE PASO -->
+    <div class="warn-box" style="margin-top:14px">
+      <strong>Siguiente paso:</strong> El archivo <code>proyecto_video.json</code> fue exportado a tu carpeta de Descargas. 
+      Ejecuta <code>python orquestador.py</code> en tu PC para generar el audio, imágenes y video automáticamente.
+    </div>
+  </div>
+
+  <!-- GUÍA RÁPIDA -->
+  <div class="card">
+    <div class="card-title">Flujo completo automatizado v5.0</div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-body">
+          <div class="step-title">Configura tu API Key de Gemini</div>
+          <div class="step-desc">Obtenla en <strong>aistudio.google.com</strong> → Get API Key. Pégala en el campo del menú lateral. Se guarda solo en tu navegador (localStorage), nunca en GitHub.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-body">
+          <div class="step-title">Ingresa el tema y genera el JSON Maestro</div>
+          <div class="step-desc">Gemini Flash genera el guion completo + 54 prompts de imagen + timestamps. Todo en formato JSON listo para Python.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-body">
+          <div class="step-title">Exporta el JSON a tu PC</div>
+          <div class="step-desc">Haz clic en "Exportar proyecto_video.json". El archivo se descarga a tu carpeta de Descargas.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">4</div>
+        <div class="step-body">
+          <div class="step-title">Ejecuta el Orquestador Python</div>
+          <div class="step-desc">Python detecta el JSON, genera el audio con edge-tts, descarga las imágenes de Imagen 4 (respetando 15 RPM), y ensambla el video final con MoviePy.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">5</div>
+        <div class="step-body">
+          <div class="step-title">Recibe el video en /output/</div>
+          <div class="step-desc">Versión limpia + versión con subtítulos quemados + 4 Shorts individuales. Solo necesitas hacer cortes finales en CapCut.</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -1112,7 +1195,7 @@ function genActualizar(){
 
 ---
 
-Usa el sistema Bonny Finance v5.0 completo. Genera:
+Usa el sistema Bonny Finance v4.0 completo. Genera:
 
 1. CLASIFICACIÓN DEL VIDEO
    - Tipo ${tipo === 'A' ? 'A (Educativo con afiliado integrado narrativamente)' : tipo === 'B' ? 'B (Review directa de producto)' : 'C (Educativo puro sin afiliado)'}
@@ -1124,13 +1207,22 @@ Usa el sistema Bonny Finance v5.0 completo. Genera:
    - 10 tags relevantes
 
 3. GUIÓN COMPLETO — 8 a 12 minutos | 1,200 a 1,800 palabras
-   [HOOK - 0 a 30 seg] Situación dolorosa de Bonny. Pregunta directa al espectador.
-   [PROBLEMA - 30 seg a 2 min] Por qué la mayoría falla. Dato + anécdota de Bonny.
-   [PROMESA - 2 a 3 min] Qué aprenderán hoy. Por qué es diferente.
-   [DESARROLLO - 3 a 6 min] Enseñanza principal. Pasos concretos que Bonny aplica.
-   ${afiliado ? '[CTA AFILIADO - 6 a 7 min] Bonny usa '+afiliado+' de forma narrativa, NO como publicidad explícita.' : ''}
-   [REFUERZO - 7 a 9 min] Consecuencias de aplicar vs no aplicar.
-   [CIERRE - 9 a 12 min] Resumen 3 puntos. CTA suscripción. Teaser próximo video.
+
+   REGLAS DE HUMANIZACIÓN (CRÍTICAS):
+   - Mencionar "Bonny" MÁXIMO 3 veces en todo el guion. El resto usar "yo", "me", "mi"
+   - El narrador habla en PRIMERA PERSONA como si le pasó a él mismo
+   - Usar frases cotidianas LATAM: "mano", "a fin de mes", "la quincena", "el chiste es que"
+   - El espectador debe pensar "eso me pasó a mí" — situaciones ultra específicas
+   - NUNCA sonar a explicación académica — hablar como en una conversación entre amigos
+   - Incluir momentos de vulnerabilidad: errores reales, vergüenzas, fracasos financieros
+
+   [HOOK - 0 a 30 seg] Situación específica y dolorosa en primera persona. Pregunta que clava.
+   [PROBLEMA - 30 seg a 2 min] Por qué la mayoría falla. Dato real + anécdota personal específica.
+   [PROMESA - 2 a 3 min] Qué aprenderán hoy. Por qué esto es diferente a lo que ya escucharon.
+   [DESARROLLO - 3 a 6 min] Enseñanza principal en pasos concretos. Ejemplos con números reales.
+   ${afiliado ? '[CTA AFILIADO - 6 a 7 min] Integrar '+afiliado+' como parte de la historia personal, NO como publicidad explícita.' : ''}
+   [REFUERZO - 7 a 9 min] Consecuencias reales de aplicar vs no aplicar. Números específicos.
+   [CIERRE - 9 a 12 min] Resumen 3 puntos. CTA orgánico. Teaser del próximo video.
 
 4. LISTA DE 54 ESCENAS — FORMATO v3.1
    Reglas obligatorias:
@@ -1288,6 +1380,8 @@ function genTendencias(){
 ROL: Eres un analista de contenido especializado en finanzas personales LATAM para YouTube.
 Canal: Bonny Finance | Audiencia: trabajadores 25-45 años clase media-baja LATAM
 
+${pais === 'USA — Latinos' ? 'CONTEXTO USA: Esta audiencia es latina viviendo en Estados Unidos. Los temas pueden venir del mundo anglosajón (401k, credit score, W2, tax return, minimum wage) pero SIEMPRE explicados en español y conectados con la realidad latina. Un tema viral en inglés adaptado al español para latinos en USA puede generar 3x más views.' : ''}
+
 Analiza el panorama de ${mes} para ${pais} y entrega:
 
 1. TOP 5 TEMAS EN TENDENCIA
@@ -1415,208 +1509,273 @@ Entrega:
   setOutput('out-ana', prompt, 'out-ana-card');
 }
 
+// ════════════════════════════════════════════════════════════
+// ORQUESTADOR IA v5.0
+// ════════════════════════════════════════════════════════════
 
-// ── ORQUESTADOR IA ────────────────────────────────────────────────
-
-var _jsonData = null;
-
+// API KEY MANAGEMENT
 function saveApiKey(){
   var k = document.getElementById('gemApiKey').value.trim();
-  localStorage.setItem('bonny_gem_key', k || '');
-  var st = document.getElementById('apiKeyStatus');
-  if(k){ st.textContent = 'Key guardada'; st.style.color = 'var(--green)'; }
-  else { st.textContent = 'Sin configurar'; st.style.color = 'var(--red)'; }
+  if(k) {
+    localStorage.setItem('bonny_gem_key', k);
+    document.getElementById('apiKeyStatus').textContent = '✓ Key guardada localmente';
+    document.getElementById('apiKeyStatus').style.color = 'var(--green)';
+  }
 }
-
-(function loadKey(){
+function loadApiKey(){
   var k = localStorage.getItem('bonny_gem_key') || '';
-  if(!k) return;
-  document.getElementById('gemApiKey').value = k;
-  var st = document.getElementById('apiKeyStatus');
-  st.textContent = 'Key cargada';
-  st.style.color = 'var(--green)';
-})();
+  if(k) {
+    document.getElementById('gemApiKey').value = k;
+    document.getElementById('apiKeyStatus').textContent = '✓ Key cargada';
+    document.getElementById('apiKeyStatus').style.color = 'var(--green)';
+  }
+}
+loadApiKey();
 
-function setP(pct, msg){
+// IMGS COUNTER
+function getImgsHoy(){
+  var hoy = new Date().toDateString();
+  var data = JSON.parse(localStorage.getItem('bonny_imgs_'+hoy)||'{"count":0}');
+  return data.count;
+}
+function addImgsHoy(n){
+  var hoy = new Date().toDateString();
+  var data = JSON.parse(localStorage.getItem('bonny_imgs_'+hoy)||'{"count":0}');
+  data.count += n;
+  localStorage.setItem('bonny_imgs_'+hoy, JSON.stringify(data));
+  document.getElementById('imgs-usadas').textContent = data.count + ' / 500';
+}
+document.getElementById('imgs-usadas').textContent = getImgsHoy() + ' / 500';
+
+// PROGRESO UI
+function setProgreso(pct, msg){
   document.getElementById('oq-prf').style.width = pct + '%';
-  document.getElementById('oq-st').textContent = msg;
+  document.getElementById('oq-status').textContent = msg;
 }
 
-async function generarJSON(){
-  var key = localStorage.getItem('bonny_gem_key') || '';
-  if(!key){ alert('Configura tu Gemini API Key primero'); return; }
+// GENERAR JSON MAESTRO
+var jsonMaestroData = null;
+
+async function generarJSONMaestro(){
+  var apiKey = localStorage.getItem('bonny_gem_key');
+  if(!apiKey){ alert('Configura tu API Key de Gemini en el menú lateral'); return; }
+  
   var tema = document.getElementById('oq-tema').value.trim();
   if(!tema){ alert('Ingresa el tema del video'); return; }
+  
+  var dur = document.getElementById('oq-dur').value;
+  var tipo = document.getElementById('oq-tipo').value;
+  var afiliado = document.getElementById('oq-afiliado').value;
+  var ctx = document.getElementById('oq-ctx').value.trim();
+  var nEscenas = Math.round(parseFloat(dur) * 6);
 
-  var dur   = document.getElementById('oq-dur').value;
-  var tipo  = document.getElementById('oq-tipo').value;
-  var af    = document.getElementById('oq-afiliado').value;
-  var ctx   = document.getElementById('oq-ctx').value.trim();
-  var n     = Math.round(parseFloat(dur) * 6);
+  document.getElementById('oq-progreso-card').style.display = 'block';
+  document.getElementById('oq-json-card').style.display = 'none';
+  document.getElementById('btn-generar-json').disabled = true;
+  setProgreso(10, 'Enviando solicitud a Gemini Flash...');
 
-  document.getElementById('oq-prog-card').style.display = 'block';
-  document.getElementById('oq-result-card').style.display = 'none';
-  document.getElementById('btn-gen-json').disabled = true;
-  setP(10, 'Enviando a Gemini...');
+  var bonnyDesc = 'Young adult Latin American man late 20s, short black messy hair, warm brown skin, plain navy blue polo shirt, mature adult face, 2D flat corporate illustration style, teal and navy color palette';
 
-  var bonny = 'Young adult Latin American man late 20s, short dark hair, warm brown skin, navy polo shirt, 2D flat corporate illustration, teal and navy palette';
+  var prompt = `Eres el sistema de producción de Bonny Finance. Genera un JSON MAESTRO completo para un video de YouTube sobre finanzas personales LATAM.
 
-  var promptText = 'Eres el sistema de produccion de Bonny Finance. Genera un JSON MAESTRO para un video de YouTube sobre finanzas personales LATAM.
+TEMA: "${tema}"
+DURACIÓN: ${dur} minutos
+ESCENAS: ${nEscenas} escenas (una por cada 10 segundos)
+TIPO: ${tipo === 'A' ? 'Educativo con afiliado integrado narrativamente' : tipo === 'B' ? 'Review directa de producto' : 'Educativo puro sin afiliado'}
+${afiliado ? 'AFILIADO: ' + afiliado : 'SIN AFILIADO'}
+${ctx ? 'CONTEXTO: ' + ctx : ''}
 
-'
-    + 'TEMA: "' + tema + '"
-'
-    + 'DURACION: ' + dur + ' minutos
-'
-    + 'ESCENAS: ' + n + ' (una cada 10 segundos)
-'
-    + 'TIPO: ' + (tipo === 'A' ? 'Educativo con afiliado' : tipo === 'B' ? 'Review directa' : 'Educativo puro') + '
-'
-    + (af ? 'AFILIADO: ' + af + '
-' : '')
-    + (ctx ? 'CONTEXTO: ' + ctx + '
-' : '')
-    + '
-REGLAS:
-'
-    + '- imagen_prompt SIEMPRE en ingles
-'
-    + '- texto_audio y texto_overlay en espanol
-'
-    + '- ES_SHORT=true en exactamente 5 escenas impactantes
-'
-    + '- texto_audio MINIMO 30 palabras por escena
-'
-    + '- Mencionar "Bonny" MAXIMO 3 veces en todo el guion — usar "yo","me","mi"
-'
-    + '- Narracion PRIMERA PERSONA, conversacional, vulnerable, identificable LATAM
-'
-    + '- duracion_estimada entre 9 y 12 segundos
-'
-    + '- tipo_escena: A (solo Bonny), B (Bonny + grafico), C (texto tipografico)
-'
-    + '- Distribucion: A 40%, B 35%, C 25%
-'
-    + '- personaje_pos: "derecha" o "izquierda"
-'
-    + '
-PERSONAJE: ' + bonny + '
-'
-    + '
-RESPONDE SOLO JSON sin texto extra:
-'
-    + '{"proyecto":"slug-kebab","titulo_seo":"titulo max 60 chars","idioma":"es-MX","duracion_minutos":' + dur + ',"total_escenas":' + n + ',"afiliado":"' + (af||'ninguno') + '","escenas":[{"id":1,"tipo_escena":"A","texto_audio":"texto minimo 30 palabras...","duracion_estimada":10,"texto_overlay":"FRASE CORTA","imagen_prompt":"english prompt...","personaje_pos":"derecha","es_short":false}],"metadata_seo":{"descripcion":"desc","tags":["tag1","tag2"]}}';
+PERSONAJE BONNY: ${bonnyDesc}
+
+REGLAS OBLIGATORIAS:
+- imagen_prompt SIEMPRE en inglés
+- texto_audio y texto_overlay SIEMPRE en español
+- Marcar ES_SHORT=true en exactamente 5 escenas más impactantes (hook, giro, solución, CTA)
+- duracion_estimada entre 9 y 12 segundos por escena
+- texto_audio MINIMO 30 palabras por escena
+- Mencionar "Bonny" MAXIMO 3 veces. Usar yo, me, mi el resto
+- Narracion PRIMERA PERSONA conversacional
+- Situaciones especificas LATAM: quincena, tarjeta, fin de mes
+- PROHIBIDO sonar academico
+- personaje_pos: "derecha" o "izquierda" (para que Python sepa dónde colocar a Bonny)
+- tipo_escena: "A" (solo Bonny narrativo), "B" (Bonny + gráfico/datos), "C" (texto tipográfico)
+- Distribución: TIPO-A 40%, TIPO-B 35%, TIPO-C 25%
+
+REGLAS DE HUMANIZACIÓN (CRÍTICAS para retención):
+- Mencionar "Bonny" MÁXIMO 3 veces en todo el guion. Usar "yo", "me", "mi" el resto del tiempo
+- Narración en PRIMERA PERSONA — el espectador debe sentir que le está hablando un amigo
+- Situaciones ultra específicas de la vida real LATAM: quincena, deudas de tarjeta, fin de mes
+- Frases cotidianas: "mano", "a fin de mes", "el chiste es que", "y ahí fue cuando entendí"
+- Momentos de vulnerabilidad real: errores, vergüenzas, fracasos financieros concretos
+- Cada escena debe hacer pensar al espectador: "eso me pasó exactamente a mí"
+- PROHIBIDO sonar académico o de manual — hablar como conversación entre amigos
+
+ESTRUCTURA DEL GUION:
+- Escenas 01-03: Hook (tensión máxima, dato impactante)
+- Escenas 04-10: Problema (Bonny en la situación)  
+- Escenas 11-20: Datos y estadísticas reales
+- Escenas 21-32: Análisis y explicación
+- Escenas 33-36: Giro sorpresa
+- Escenas 37-48: Solución paso a paso
+- Escenas 49-${nEscenas}: Resumen y CTA
+
+RESPONDE ÚNICAMENTE con el JSON, sin texto adicional, sin markdown, sin explicaciones:
+
+{
+  "proyecto": "slug-del-tema-en-kebab-case",
+  "titulo_seo": "Título optimizado para YouTube máx 60 caracteres",
+  "idioma": "es-MX",
+  "duracion_minutos": ${dur},
+  "total_escenas": ${nEscenas},
+  "afiliado": "${afiliado || 'ninguno'}",
+  "escenas": [
+    {
+      "id": 1,
+      "tipo_escena": "A",
+      "texto_audio": "Guion hablado para esta escena en español natural y conversacional",
+      "duracion_estimada": 10,
+      "texto_overlay": "FRASE CORTA",
+      "imagen_prompt": "Detailed image prompt in English for Gemini Imagen 4, corporate flat illustration style, ${bonnyDesc}",
+      "personaje_pos": "derecha",
+      "es_short": false
+    }
+  ],
+  "metadata_seo": {
+    "descripcion": "Descripción para YouTube con keywords",
+    "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
+  }
+}`;
 
   try {
-    setP(30, 'Gemini generando JSON Maestro...');
+    setProgreso(30, 'Gemini Flash generando el JSON Maestro...');
+    
     var resp = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + key,
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=' + apiKey,
       {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({
-          contents: [{parts: [{text: promptText}]}],
+          contents: [{parts: [{text: prompt}]}],
           generationConfig: {temperature: 0.7, maxOutputTokens: 65536}
         })
       }
     );
 
     if(!resp.ok){
-      var e = await resp.json().catch(function(){return {};});
-      throw new Error('Error Gemini ' + resp.status + ': ' + (e.error && e.error.message ? e.error.message : resp.statusText));
+      var err = await resp.json();
+      throw new Error('Error Gemini: ' + (err.error?.message || resp.status));
     }
 
-    setP(70, 'Procesando respuesta...');
+    setProgreso(70, 'Procesando respuesta...');
     var data = await resp.json();
-    var raw = data.candidates[0].content.parts[0].text;
+    var rawText = data.candidates[0].content.parts[0].text;
+    
+    // Clean JSON from markdown if present
+    rawText = rawText.split('```json').join('').split('```').join('').trim();
+    
+    // Fix truncated JSON if model cut off output
+    var trimmed = rawText.trim();
+    // Ensure JSON is complete - find last valid closing brace
+    var lastBrace = trimmed.lastIndexOf('}');
+    var lastBracket = trimmed.lastIndexOf(']');
+    if(lastBrace > lastBracket && !trimmed.endsWith('}}')){
+      // Try to close incomplete JSON
+      var openBraces = (trimmed.match(/{/g)||[]).length;
+      var closeBraces = (trimmed.match(/}/g)||[]).length;
+      var openBrackets = (trimmed.match(/\[/g)||[]).length;
+      var closeBrackets = (trimmed.match(/\]/g)||[]).length;
+      while(closeBrackets < openBrackets) { trimmed += ']'; closeBrackets++; }
+      while(closeBraces < openBraces) { trimmed += '}'; closeBraces++; }
+    }
+    var jsonData = JSON.parse(trimmed);
+    jsonMaestroData = jsonData;
 
-    // Clean markdown fences without using backticks in code
-    var fence = String.fromCharCode(96,96,96);
-    raw = raw.split(fence + 'json').join('').split(fence).join('').trim();
+    setProgreso(90, 'Renderizando resultado...');
+    renderJsonMaestro(jsonData);
+    setProgreso(100, '✓ JSON Maestro generado exitosamente');
+    
+    setTimeout(function(){
+      document.getElementById('oq-progreso-card').style.display = 'none';
+    }, 2000);
 
-    // Fix truncated JSON
-    var opens = (raw.match(/\{/g)||[]).length;
-    var closes = (raw.match(/\}/g)||[]).length;
-    var oArr = (raw.match(/\[/g)||[]).length;
-    var cArr = (raw.match(/\]/g)||[]).length;
-    while(cArr < oArr){ raw += ']'; cArr++; }
-    while(closes < opens){ raw += '}'; closes++; }
-
-    _jsonData = JSON.parse(raw);
-    setP(100, 'JSON Maestro generado');
-    renderResult(_jsonData);
-    setTimeout(function(){ document.getElementById('oq-prog-card').style.display = 'none'; }, 1500);
-
-  } catch(err) {
-    setP(0, 'Error: ' + err.message);
-    document.getElementById('oq-st').style.color = 'var(--red)';
-    alert('Error: ' + err.message);
+  } catch(e) {
+    setProgreso(0, '✗ Error: ' + e.message);
+    document.getElementById('oq-status').style.color = 'var(--red)';
+    alert('Error generando JSON: ' + e.message);
   }
 
-  document.getElementById('btn-gen-json').disabled = false;
+  document.getElementById('btn-generar-json').disabled = false;
 }
 
-function renderResult(d){
-  document.getElementById('oq-result-card').style.display = 'block';
-  var shorts = d.escenas.filter(function(e){return e.es_short;});
+function renderJsonMaestro(data){
+  var card = document.getElementById('oq-json-card');
+  card.style.display = 'block';
 
-  document.getElementById('oq-stats').innerHTML =
-    mc('Escenas', d.total_escenas, 'guion completo') +
-    mc('Duracion', d.duracion_minutos + ' min', 'video objetivo') +
-    mc('Shorts', shorts.length, 'identificados') +
-    mc('Afiliado', d.afiliado === 'ninguno' ? 'Ninguno' : d.afiliado, '');
+  // Resumen
+  var shorts = data.escenas.filter(function(e){return e.es_short;});
+  document.getElementById('oq-resumen').innerHTML =
+    miniStatCard('Escenas totales', data.total_escenas, 'del guion completo') +
+    miniStatCard('Duración', data.duracion_minutos + ' min', 'video largo') +
+    miniStatCard('4 Shorts', shorts.length, 'momentos identificados') +
+    miniStatCard('Afiliado', data.afiliado === 'ninguno' ? 'Ninguno' : '✓', data.afiliado !== 'ninguno' ? data.afiliado : 'video educativo puro');
 
-  document.getElementById('oq-out').textContent = JSON.stringify(d, null, 2);
+  // JSON display
+  document.getElementById('oq-json-out').textContent = JSON.stringify(data, null, 2);
 
-  document.getElementById('oq-shorts').innerHTML = shorts.map(function(s){
-    return '<div class="mini-card"><div class="mini-card-label">Escena ' + s.id + ' — SHORT</div>'
-      + '<div style="font-size:12px;color:var(--text);margin:4px 0"><strong>' + s.texto_overlay + '</strong></div>'
-      + '<div class="mini-card-sub">' + s.texto_audio.substring(0,80) + '...</div></div>';
+  // Shorts
+  var shortsHtml = shorts.map(function(s){
+    return '<div class="mini-card"><div class="mini-card-label">Escena ' + s.id + ' — es_short ✓</div>' +
+      '<div style="font-size:12px;color:var(--text);margin:4px 0">' + s.texto_overlay + '</div>' +
+      '<div class="mini-card-sub" style="font-size:10px">' + s.texto_audio.substring(0,80) + '...</div></div>';
   }).join('');
+  document.getElementById('oq-shorts').innerHTML = shortsHtml;
 
-  document.getElementById('oq-result-card').scrollIntoView({behavior:'smooth'});
+  card.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
-function mc(label, val, sub){
-  return '<div class="mini-card"><div class="mini-card-label">'+label+'</div>'
-    +'<div class="mini-card-val">'+val+'</div>'
-    +'<div class="mini-card-sub">'+sub+'</div></div>';
+function miniStatCard(label, val, sub){
+  return '<div class="mini-card"><div class="mini-card-label">'+label+'</div>' +
+    '<div class="mini-card-val">'+val+'</div>' +
+    '<div class="mini-card-sub">'+sub+'</div></div>';
 }
 
-function exportJSON(){
-  if(!_jsonData){ alert('Genera el JSON primero'); return; }
-  var blob = new Blob([JSON.stringify(_jsonData, null, 2)], {type:'application/json'});
+function exportarJSON(){
+  if(!jsonMaestroData){ alert('Genera el JSON primero'); return; }
+  var blob = new Blob([JSON.stringify(jsonMaestroData, null, 2)], {type:'application/json'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = (_jsonData.proyecto || 'proyecto_video') + '.json';
+  a.download = (jsonMaestroData.proyecto || 'proyecto_video') + '.json';
   a.click();
   showToast();
 }
 
-function exportGuion(){
-  if(!_jsonData){ alert('Genera el JSON primero'); return; }
-  var d = _jsonData;
-  var sep = '='.repeat(60);
-  var lines = [
-    'GUION - ' + d.titulo_seo,
-    'Proyecto: ' + d.proyecto,
-    'Duracion: ' + d.duracion_minutos + ' minutos | ' + d.total_escenas + ' escenas',
-    sep, ''
-  ];
-  d.escenas.forEach(function(e){
-    lines.push('--- ESCENA ' + String(e.id).padStart(2,'0') + ' | TIPO-' + e.tipo_escena + (e.es_short ? ' | SHORT' : '') + ' ---');
+function exportarGuion(){
+  if(!jsonMaestroData){ alert('Genera el JSON primero'); return; }
+  var d = jsonMaestroData;
+  var sep = ''; for(var i=0;i<60;i++) sep+='=';
+  var lines = [];
+  lines.push('GUION - ' + d.titulo_seo);
+  lines.push('Proyecto: ' + d.proyecto);
+  lines.push('Duracion: ' + d.duracion_minutos + ' min | ' + d.total_escenas + ' escenas');
+  lines.push(sep);
+  lines.push('');
+  for(var j=0;j<d.escenas.length;j++){
+    var e = d.escenas[j];
+    var num = String(e.id).padStart(2,'0');
+    lines.push('--- ESCENA ' + num + ' | TIPO-' + e.tipo_escena + (e.es_short ? ' | SHORT' : '') + ' ---');
     lines.push('NARRACION: ' + e.texto_audio);
     lines.push('OVERLAY: ' + e.texto_overlay);
-    lines.push('IMAGEN: escena_' + String(e.id).padStart(2,'0') + '.png');
+    lines.push('IMAGEN: escena_' + num + '.png');
     lines.push('POS: ' + (e.personaje_pos || 'centro'));
     lines.push('');
-  });
+  }
   lines.push(sep);
-  lines.push('TAGS: ' + (d.metadata_seo && d.metadata_seo.tags ? d.metadata_seo.tags.join(', ') : ''));
-  var blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  if(d.metadata_seo && d.metadata_seo.tags) lines.push('TAGS: ' + d.metadata_seo.tags.join(', '));
+  var txt = lines.join('\n');
+  var blob = new Blob([txt], {type:'text/plain;charset=utf-8'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = (d.proyecto || 'guion') + '_capcut.txt';
+  a.download = (d.proyecto||'guion') + '_capcut.txt';
   a.click();
   showToast();
 }
