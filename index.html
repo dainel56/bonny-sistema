@@ -800,7 +800,7 @@ select option{background:var(--navy2);color:var(--text)}
       <span class="output-label">Base prompt (inglés — mejor calidad en Gemini)</span>
       <button class="btn btn-copy btn-sm" onclick="copyOutput('bonny-base')">📋 Copiar</button>
     </div>
-    <div class="output-box" id="bonny-base">CHARACTER: A young Latin American man, 28-35 years old, lean-average build, short black slightly messy hair, warm brown skin (#C68642), wearing a plain navy blue shirt and casual pants. 2D flat design illustration for adult audience, semi-realistic clean lines, expressive eyes, mature adult face. NOT a child, NOT chibi, NOT kids cartoon. No suit, no tie — everyday working class look.
+    <div class="output-box" id="bonny-base">CHARACTER: A young Latin American man, 28-35 years old, lean-average build, short black slightly messy hair, warm brown skin (#C68642), wearing a plain navy blue shirt and casual pants. 2D flat design illustration for adult audience, semi-realistic clean lines, expressive eyes, mature adult face. NOT a child, NOT chibi, NOT female, NOT woman, NOT feminine, NOT girl, NOT kids cartoon. No suit, no tie — everyday working class look.
 
 STYLE: Flat design with soft shadows, vibrant but not saturated colors, professional content quality.
 
@@ -1261,9 +1261,9 @@ Usa el sistema Bonny Finance v4.0 completo. Genera:
    TIPO-C: Texto tipográfico grande en español como elemento principal.
    
    Prefijo obligatorio en TODAS las escenas — personaje Bonny:
-   Young adult Latin American man late 20s, short black slightly messy hair, 
-   warm brown skin #C68642, plain navy shirt and casual pants, mature adult face,
-   NOT a child, NOT chibi. Palette: teal #00d4aa and navy #1A1A2E.
+   MALE adult Latin American man late 20s, masculine strong jaw, short black slightly messy hair, 
+   warm brown skin #C68642, plain navy shirt and casual pants, mature adult MALE face,
+   NOT a child, NOT chibi, NOT female, NOT woman, NOT feminine, NOT girl. Palette: teal #00d4aa and navy #1A1A2E.
 
 5. PROMPT DE THUMBNAIL
    - Bonny con expresión según el tema
@@ -1326,7 +1326,7 @@ function genMiniaturas(){
   var emocion=chips.length>0?chips[0]:'shock y preocupación';
   if(!tema){ alert('Ingresa el tema del video'); return; }
 
-  var bonnyBase='Young adult Latin American man 28-35yo, short black messy hair, warm brown skin #C68642, navy shirt and casual pants, mature adult face NOT a child NOT chibi, 2D flat design adult illustration, palette teal #00d4aa and navy #1A1A2E';
+  var bonnyBase='MALE adult Latin American man 28-35yo, masculine features strong jaw, short black messy hair, warm brown skin #C68642, navy shirt and casual pants, mature adult MALE face NOT a child NOT female NOT woman NOT feminine NOT girl NOT chibi, 2D flat design adult illustration, palette teal #00d4aa and navy #1A1A2E';
 
   var out=
 `=== MINIATURA VARIANTE 1 — EMOCIÓN: ${emocion.toUpperCase()} ===
@@ -1369,8 +1369,8 @@ TIPO-B: Gráfico/infografía + texto en español entre comillas + Bonny señalan
 TIPO-C: Texto tipográfico grande en español como elemento visual principal.
 
 PREFIJO BONNY (incluir en TODAS las escenas TIPO-A):
-Young adult Latin American man late 20s, short black slightly messy hair,
-warm brown skin #C68642, plain navy shirt and casual pants, mature adult face,
+MALE adult Latin American man late 20s, masculine strong jaw, short black slightly messy hair,
+warm brown skin #C68642, plain navy shirt and casual pants, mature adult MALE face,
 NOT a child NOT chibi. Style: 2D flat design adult illustration.
 Palette: teal #00d4aa and navy #1A1A2E.
 
@@ -1598,7 +1598,7 @@ async function generarJSONMaestro(){
   document.getElementById('btn-generar-json').disabled = true;
   setProgreso(10, 'Enviando solicitud a Gemini Flash...');
 
-  var bonnyDesc = 'Young adult Latin American man late 20s, short black messy hair, warm brown skin, plain navy blue polo shirt, mature adult face, 2D flat corporate illustration style, teal and navy color palette';
+  var bonnyDesc = 'MALE adult Latin American man late 20s, masculine features strong jaw, short black messy hair, warm brown skin, plain navy blue polo shirt, mature adult MALE face, NOT female NOT woman NOT feminine, 2D flat corporate illustration style, teal and navy color palette';
 
   var prompt = `Eres el sistema de produccion de Bonny Finance. Genera un JSON MAESTRO completo para un video de YouTube sobre finanzas personales LATAM.
 
@@ -1613,6 +1613,10 @@ PERSONAJE BONNY: ${bonnyDesc}
 
 REGLAS OBLIGATORIAS:
 - imagen_prompt SIEMPRE en ingles
+- imagen_prompt tipo A y B: describir escena y accion de Bonny, el sistema agrega el prefijo de identidad automaticamente
+- imagen_prompt tipo C: solo describir el fondo y elementos geometricos abstractos, SIN pedir texto ni letras ni listas
+- NUNCA incluir en imagen_prompt: text overlay, bullet points, numbered list, infographic, overlay space, typography
+- La identidad visual de Bonny se aplica automaticamente - solo describir la escena
 - texto_audio y texto_overlay SIEMPRE en espanol
 - Marcar ES_SHORT=true en exactamente 5 escenas mas impactantes (hook, giro, solucion, CTA)
 - duracion_estimada entre 9 y 12 segundos por escena
@@ -1621,6 +1625,7 @@ REGLAS OBLIGATORIAS:
 - ' + '- Narrativa: ' + getNarrativa() + '
 - Situaciones especificas LATAM: quincena, tarjeta, fin de mes
 - PROHIBIDO sonar academico
+- Usar DOLARES USD como moneda, no pesos
 - personaje_pos: "derecha" o "izquierda" (para que Python sepa donde colocar a Bonny)
 - tipo_escena: "A" (solo Bonny narrativo), "B" (Bonny + grafico/datos), "C" (texto tipografico)
 - Distribucion: TIPO-A 40%, TIPO-B 35%, TIPO-C 25%
@@ -1633,6 +1638,7 @@ REGLAS DE HUMANIZACION (CRITICAS para retencion):
 - Momentos de vulnerabilidad real: errores, verguenzas, fracasos financieros concretos
 - Cada escena debe hacer pensar al espectador: "eso me paso exactamente a mi"
 - PROHIBIDO sonar academico o de manual - hablar como conversacion entre amigos
+- Usar DOLARES (USD) como moneda de referencia, no pesos
 
 ESTRUCTURA DEL GUION:
 - Escenas 01-03: Hook (tension maxima, dato impactante)
@@ -1851,6 +1857,7 @@ function generarPromptClaude(){
   p.push('   - Mencionar Bonny MAXIMO 3 veces. Usar yo, me, mi');
   p.push('   - PRIMERA PERSONA, conversacional, situaciones LATAM reales');
   p.push('   - PROHIBIDO sonar academico');
+  p.push('   - Usar DOLARES (USD, $) como moneda, no pesos');
   p.push('   - TIPO DE NARRATIVA: ' + getNarrativa());
   p.push('');
   p.push('4. JSON MAESTRO con ' + n + ' escenas:');
