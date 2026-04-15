@@ -8,7 +8,7 @@
 <style>
 /* ── ROOT ────────────────────────────────────────────────────────── */
 :root{
-  --teal:    #00d4aa;
+  --teal:    teal green;
   --teal2:   #00a886;
   --navy:    #0d1b2a;
   --navy2:   #1a2f45;
@@ -777,7 +777,7 @@ select option{background:var(--navy2);color:var(--text)}
           <tr><td>Complexión</td><td>Delgado-promedio</td></tr>
           <tr><td>Cabello</td><td>Negro, corto, ligeramente despeinado</td></tr>
           <tr><td>Vestimenta</td><td>Camisa azul marino/blanca + pantalón casual</td></tr>
-          <tr><td>Piel (hex)</td><td><span class="badge" style="background:rgba(198,134,66,.15);color:#C68642;border:1px solid rgba(198,134,66,.3)">#C68642</span></td></tr>
+          <tr><td>Piel (hex)</td><td><span class="badge" style="background:rgba(198,134,66,.15);color:warm brown;border:1px solid rgba(198,134,66,.3)">warm brown</span></td></tr>
         </tbody>
       </table>
     </div>
@@ -785,8 +785,8 @@ select option{background:var(--navy2);color:var(--text)}
       <div class="card-title">Paleta del canal</div>
       <table class="tbl">
         <tbody>
-          <tr><td>Azul noche</td><td><span class="badge" style="background:rgba(26,26,46,.5);color:#a0a0c0;border:1px solid rgba(100,100,200,.3)">#1A1A2E</span></td></tr>
-          <tr><td>Dorado</td><td><span class="badge badge-gold">#F4A300</span></td></tr>
+          <tr><td>Azul noche</td><td><span class="badge" style="background:rgba(26,26,46,.5);color:#a0a0c0;border:1px solid rgba(100,100,200,.3)">deep navy blue</span></td></tr>
+          <tr><td>Dorado</td><td><span class="badge badge-gold">golden yellow</span></td></tr>
           <tr><td>Verde dinero</td><td><span class="badge badge-green">#2ECC71</span></td></tr>
           <tr><td>Fondo claro</td><td><span class="badge" style="background:rgba(245,245,245,.1);color:#ccc;border:1px solid rgba(200,200,200,.2)">#F5F5F5</span></td></tr>
         </tbody>
@@ -800,11 +800,11 @@ select option{background:var(--navy2);color:var(--text)}
       <span class="output-label">Base prompt (inglés — mejor calidad en Gemini)</span>
       <button class="btn btn-copy btn-sm" onclick="copyOutput('bonny-base')">📋 Copiar</button>
     </div>
-    <div class="output-box" id="bonny-base">CHARACTER: A young Latin American man, 28-35 years old, lean-average build, short black slightly messy hair, warm brown skin (#C68642), wearing a plain navy blue shirt and casual pants. 2D flat design illustration for adult audience, semi-realistic clean lines, expressive eyes, mature adult face. NOT a child, NOT chibi, NOT female, NOT woman, NOT feminine, NOT girl, NOT kids cartoon. No suit, no tie — everyday working class look.
+    <div class="output-box" id="bonny-base">CHARACTER: A young Latin American man, 28-35 years old, lean-average build, short black slightly messy hair, warm brown skin (warm brown), wearing a plain navy blue shirt and casual pants. 2D flat design illustration for adult audience, semi-realistic clean lines, expressive eyes, mature adult face. NOT a child, NOT chibi, NOT female, NOT woman, NOT feminine, NOT girl, NOT kids cartoon. No suit, no tie — everyday working class look.
 
 STYLE: Flat design with soft shadows, vibrant but not saturated colors, professional content quality.
 
-PALETTE: Deep navy blue #1A1A2E backgrounds, golden yellow #F4A300 accents, money green #2ECC71 highlights, teal #00d4aa details.
+PALETTE: Deep navy blue deep navy blue backgrounds, golden yellow golden yellow accents, money green #2ECC71 highlights, teal teal green details.
 
 ATMOSPHERE: [INSERTAR AQUÍ: descripción de la escena, emoción, acción, entorno]</div>
   </div>
@@ -1262,8 +1262,8 @@ Usa el sistema Bonny Finance v4.0 completo. Genera:
    
    Prefijo obligatorio en TODAS las escenas — personaje Bonny:
    MALE adult Latin American man late 20s, masculine strong jaw, short black slightly messy hair, 
-   warm brown skin #C68642, plain navy shirt and casual pants, mature adult MALE face,
-   NOT a child, NOT chibi, NOT female, NOT woman, NOT feminine, NOT girl. Palette: teal #00d4aa and navy #1A1A2E.
+   warm brown skin warm brown, plain navy shirt and casual pants, mature adult MALE face,
+   NOT a child, NOT chibi, NOT female, NOT woman, NOT feminine, NOT girl. Palette: teal teal green and navy deep navy blue.
 
 5. PROMPT DE THUMBNAIL
    - Bonny con expresión según el tema
@@ -1326,7 +1326,7 @@ function genMiniaturas(){
   var emocion=chips.length>0?chips[0]:'shock y preocupación';
   if(!tema){ alert('Ingresa el tema del video'); return; }
 
-  var bonnyBase='MALE adult Latin American man 28-35yo, masculine features strong jaw, short black messy hair, warm brown skin #C68642, navy shirt and casual pants, mature adult MALE face NOT a child NOT female NOT woman NOT feminine NOT girl NOT chibi, 2D flat design adult illustration, palette teal #00d4aa and navy #1A1A2E';
+  var bonnyBase='MALE adult Latin American man 28-35yo, masculine features strong jaw, short black messy hair, warm brown skin warm brown, navy shirt and casual pants, mature adult MALE face NOT a child NOT female NOT woman NOT feminine NOT girl NOT chibi, 2D flat design adult illustration, palette teal teal green and navy deep navy blue';
 
   var out=
 `=== MINIATURA VARIANTE 1 — EMOCIÓN: ${emocion.toUpperCase()} ===
@@ -1370,9 +1370,9 @@ TIPO-C: Texto tipográfico grande en español como elemento visual principal.
 
 PREFIJO BONNY (incluir en TODAS las escenas TIPO-A):
 MALE adult Latin American man late 20s, masculine strong jaw, short black slightly messy hair,
-warm brown skin #C68642, plain navy shirt and casual pants, mature adult MALE face,
+warm brown skin warm brown, plain navy shirt and casual pants, mature adult MALE face,
 NOT a child NOT chibi. Style: 2D flat design adult illustration.
-Palette: teal #00d4aa and navy #1A1A2E.
+Palette: teal teal green and navy deep navy blue.
 
 FORMATO DE CADA ESCENA:
 ESCENA [N] | TIPO-[A/B/C] | [Prompt en inglés. Texto en imagen entre "comillas" en español si aplica.]
@@ -1615,7 +1615,7 @@ REGLAS OBLIGATORIAS:
 - imagen_prompt SIEMPRE en ingles
 - imagen_prompt tipo A y B: describir escena y accion de Bonny, el sistema agrega el prefijo de identidad automaticamente
 - imagen_prompt tipo C: solo describir el fondo y elementos geometricos abstractos, SIN pedir texto ni letras ni listas
-- NUNCA incluir en imagen_prompt: text overlay, bullet points, numbered list, infographic, overlay space, typography
+- NUNCA incluir en imagen_prompt: text overlay, bullet points, numbered list, infographic, overlay space, typography, subscribe, like, comment, hex codes como 1A1A2E o F4A300
 - La identidad visual de Bonny se aplica automaticamente - solo describir la escena
 - texto_audio y texto_overlay SIEMPRE en espanol
 - Marcar ES_SHORT=true en exactamente 5 escenas mas impactantes (hook, giro, solucion, CTA)
