@@ -1839,9 +1839,9 @@ function generarPromptClaude(){
   p.push('- Distribucion A 40%, B 35%, C 25%');
   if(ctx) p.push('CONTEXTO: ' + ctx);
   window._claudePrompt = p.join(NL);
-  document.getElementById('oq-prog-card').style.display = 'block';
+  document.getElementById('oq-progreso-card').style.display = 'block';
   document.getElementById('oq-prf').style.width = '100%';
-  document.getElementById('oq-st').innerHTML =
+  document.getElementById('oq-status').innerHTML =
     '<strong style="color:var(--gold)">Prompt listo para Claude Project Bonny</strong><br>' +
     '<small>1. Copia el prompt  2. Pegalo en Claude Project  3. Copia el JSON resultado  4. Pegalo abajo e importa</small>';
   if(!document.getElementById('claude-actions')){
@@ -1853,7 +1853,7 @@ function generarPromptClaude(){
       '<textarea id="claude-json-input" rows="4" placeholder="Pega aqui el JSON generado por Claude..."' +
       ' style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:DM Mono,monospace;font-size:10px;padding:8px"></textarea>' +
       '<button class="btn btn-outline btn-sm" onclick="importarJSONdeClaude()">Importar JSON de Claude</button>';
-    document.getElementById('oq-prog-card').appendChild(div);
+    document.getElementById('oq-progreso-card').appendChild(div);
   }
   document.getElementById('claude-actions').style.display = 'flex';
 }
