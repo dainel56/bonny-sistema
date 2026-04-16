@@ -132,9 +132,10 @@ select option{background:var(--navy2);color:var(--text)}
 /* ── BUTTONS ─────────────────────────────────────────────────────── */
 .btn{
   font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:13px;
-  padding:9px 18px;border-radius:7px;border:none;cursor:pointer;
+  padding:9px 18px;border-radius:7px;border:1px solid var(--border);cursor:pointer;
   display:inline-flex;align-items:center;gap:7px;
   transition:all .15s;white-space:nowrap;
+  background:rgba(0,212,170,.12);color:var(--teal);
 }
 .btn-primary{background:var(--teal);color:var(--navy);font-weight:700}
 .btn-primary:hover{background:var(--teal2);transform:translateY(-1px)}
@@ -1026,14 +1027,14 @@ ATMOSPHERE: [INSERTAR AQUÍ: descripción de la escena, emoción, acción, entor
     <div class="form-group" style="margin-bottom:12px">
       <label>Motor de generacion</label>
       <div style="display:flex;gap:16px;margin-top:6px;flex-wrap:wrap">
-        <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;color:var(--text);letter-spacing:0;text-transform:none;font-family:Space Grotesk,sans-serif">
-          <input type="radio" name="motor" value="gemini" checked style="accent-color:var(--teal)">
-          Gemini AI Studio <span style="font-size:10px;color:var(--muted)">(automatico)</span>
-        </label>
-        <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:12px;color:var(--text);letter-spacing:0;text-transform:none;font-family:Space Grotesk,sans-serif">
-          <input type="radio" name="motor" value="claude" style="accent-color:var(--gold)">
-          Claude Project <span style="font-size:10px;color:var(--muted)">(mas calidad)</span>
-        </label>
+        <div style="display:flex;align-items:center;gap:7px;cursor:pointer">
+          <input type="radio" name="motor" id="motor-gemini" value="gemini" checked style="accent-color:var(--teal)">
+          <span style="font-size:12px;color:var(--text);font-family:Space Grotesk,sans-serif">Gemini AI Studio <span style="font-size:10px;color:var(--muted)">(automatico)</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:7px;cursor:pointer">
+          <input type="radio" name="motor" id="motor-claude" value="claude" style="accent-color:var(--gold)">
+          <span style="font-size:12px;color:var(--text);font-family:Space Grotesk,sans-serif">Claude Project <span style="font-size:10px;color:var(--muted)">(mas calidad)</span></span>
+        </div>
       </div>
     </div>
     <div class="btn-row">
@@ -1069,6 +1070,7 @@ ATMOSPHERE: [INSERTAR AQUÍ: descripción de la escena, emoción, acción, entor
         <button class="btn btn-copy btn-sm" onclick="copyOutput('oq-json-out')">📋 Copiar JSON</button>
         <button class="btn btn-primary btn-sm" onclick="exportarJSON()">⬇ Exportar proyecto_video.json</button>
         <button class="btn btn-outline btn-sm" onclick="exportarGuion()">&#128196; Exportar guion .txt</button>
+        <button class="btn btn-outline btn-sm" onclick="exportarPrompts()">&#128247; Exportar prompts imagen</button>
       </div>
     </div>
     <div class="output-box" id="oq-json-out" style="max-height:350px;font-size:11px"></div>
@@ -1612,7 +1614,9 @@ ${ctx ? 'CONTEXTO: ' + ctx : ''}
 PERSONAJE BONNY: ${bonnyDesc}
 
 REGLAS OBLIGATORIAS:
-- imagen_prompt SIEMPRE en ingles
+- imagen_prompt SIEMPRE en ingles (descripcion de la escena)
+- texto_overlay SIEMPRE en espanol (es lo que se vera en pantalla)
+- Si la imagen tiene texto visible (tipo C), debe estar en espanol en el prompt entre comillas
 - imagen_prompt tipo A y B: describir escena y accion de Bonny, el sistema agrega el prefijo de identidad automaticamente
 - imagen_prompt tipo C: solo describir el fondo y elementos geometricos abstractos, SIN pedir texto ni letras ni listas
 - NUNCA incluir en imagen_prompt: text overlay, bullet points, numbered list, infographic, overlay space, typography, subscribe, like, comment, hex codes como 1A1A2E o F4A300
@@ -1779,6 +1783,27 @@ function exportarJSON(){
   showToast();
 }
 
+function exportarPrompts(){
+  if(!jsonMaestroData){ alert('Genera el JSON primero'); return; }
+  var d = jsonMaestroData;
+  var lines = [];
+  lines.push('PROMPTS DE IMAGEN - ' + d.proyecto);
+  lines.push('Total: ' + d.total_escenas + ' escenas');
+  lines.push('='.repeat(60));
+  lines.push('');
+  d.escenas.forEach(function(e){
+    lines.push('ESCENA ' + String(e.id).padStart(2,'0') + ' | TIPO-' + e.tipo_escena + (e.es_short?' | SHORT':''));
+    lines.push(e.imagen_prompt);
+    lines.push('');
+  });
+  var blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (d.proyecto||'prompts') + '_imagenes.txt';
+  a.click();
+  showToast();
+}
+
 function exportarGuion(){
   if(!jsonMaestroData){ alert('Genera el JSON primero'); return; }
   var d = jsonMaestroData;
@@ -1884,7 +1909,7 @@ function generarPromptClaude(){
       '<textarea id="claude-json-input" rows="4" placeholder="Pega aqui el JSON generado por Claude..."' +
       ' style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:DM Mono,monospace;font-size:10px;padding:8px"></textarea>' +
       '<button class="btn btn-outline btn-sm" onclick="importarJSONdeClaude()">Importar JSON de Claude</button>';
-    document.getElementById('oq-progreso-card').appendChild(div);
+    var pc=document.getElementById('oq-progreso-card'); if(pc) pc.appendChild(div);
   }
   document.getElementById('claude-actions').style.display = 'flex';
 }
@@ -1910,13 +1935,18 @@ function importarJSONdeClaude(){
   try {
     var fence = String.fromCharCode(96,96,96);
     raw = raw.split(fence+'json').join('').split(fence).join('').trim();
+    var s = raw.indexOf('{');
+    var e2 = raw.lastIndexOf('}');
+    if(s > 0) raw = raw.slice(s);
+    if(e2 > -1) raw = raw.slice(0, e2-s+1);
     var data = JSON.parse(raw);
     jsonMaestroData = data;
+    var prog = document.getElementById('oq-progreso-card');
+    if(prog) prog.style.display = 'none';
     renderJsonMaestro(data);
-    document.getElementById('oq-prog-card').style.display = 'none';
     showToast();
   } catch(e) {
-    alert('Error al parsear JSON: ' + e.message);
+    alert('Error al parsear JSON: ' + e.message + '\n\nAsegurate de pegar solo el JSON');
   }
 }
 
