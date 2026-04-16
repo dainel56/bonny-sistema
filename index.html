@@ -137,11 +137,11 @@ select option{background:var(--navy2);color:var(--text)}
   transition:all .15s;white-space:nowrap;
   background:rgba(0,212,170,.12);color:var(--teal);
 }
-.btn-primary{background:var(--teal);color:var(--navy);font-weight:700}
+.btn-primary{background:var(--teal) !important;color:var(--navy) !important;font-weight:700;border-color:var(--teal) !important}
 .btn-primary:hover{background:var(--teal2);transform:translateY(-1px)}
-.btn-gold{background:var(--gold);color:var(--navy);font-weight:700}
+.btn-gold{background:var(--gold) !important;color:var(--navy) !important;font-weight:700;border-color:var(--gold) !important}
 .btn-gold:hover{opacity:.88;transform:translateY(-1px)}
-.btn-outline{background:transparent;color:var(--teal);border:1px solid var(--border)}
+.btn-outline{background:transparent !important;color:var(--teal) !important;border:1px solid var(--teal) !important}
 .btn-outline:hover{border-color:var(--teal);background:rgba(0,212,170,.08)}
 .btn-ghost{background:transparent;color:var(--muted);border:1px solid transparent}
 .btn-ghost:hover{color:var(--text);background:rgba(255,255,255,.05)}
@@ -1868,6 +1868,8 @@ function generarPromptClaude(){
   var tipoLabel = tipo==='A'?'A (Educativo con afiliado)':tipo==='B'?'B (Review directa)':'C (Educativo puro)';
   var NL = '\n';
   var p = [];
+  p.push('INSTRUCCION CRITICA: Al final de tu respuesta DEBES incluir el JSON MAESTRO COMPLETO entre triple backtick json. Sin esto el sistema no funciona.');
+  p.push('');
   p.push('ACTUALIZAR ' + tema + ' Tipo-' + tipo + (af?' '+af:''));
   p.push('');
   p.push('---');
@@ -1885,7 +1887,7 @@ function generarPromptClaude(){
   p.push('   - Usar DOLARES (USD, $) como moneda, no pesos');
   p.push('   - TIPO DE NARRATIVA: ' + getNarrativa());
   p.push('');
-  p.push('4. JSON MAESTRO con ' + n + ' escenas:');
+  p.push('4. JSON MAESTRO COMPLETO (SALIDA FINAL OBLIGATORIA):');
   p.push('{"proyecto":"slug-kebab","titulo_seo":"...","idioma":"es-MX","duracion_minutos":'+dur+',"total_escenas":'+n+',"afiliado":"'+(af||'ninguno')+'","escenas":[{"id":1,"tipo_escena":"A","texto_audio":"min 30 palabras...","duracion_estimada":10,"texto_overlay":"FRASE","imagen_prompt":"english prompt...","personaje_pos":"derecha","es_short":false}],"metadata_seo":{"descripcion":"...","tags":["tag1"]}}');
   p.push('');
   p.push('REGLAS JSON:');
